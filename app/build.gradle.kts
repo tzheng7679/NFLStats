@@ -39,6 +39,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+        resources.excludes.add("mozilla/*")
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -88,4 +94,7 @@ dependencies {
     // Optional - Integration with RxJava
     implementation("androidx.compose.runtime:runtime-rxjava2")
     implementation("androidx.compose.material3:material3:1.1.2")
+
+    //Web-scraping toolkit
+    implementation("it.skrape:skrapeit:1.2.2")
 }
