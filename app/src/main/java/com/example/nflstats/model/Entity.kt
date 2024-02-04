@@ -12,14 +12,18 @@ abstract class Entity() {
     abstract var uniqueAdds : MutableSet<String>
     abstract var uniqueSubs : MutableSet<String>
 
-    companion object { val Maps = Maps() }
+    //set of maps and url base
+    companion object {
+        val Maps = Maps()
+        val baseURL = "https://www.pro-football-reference.com/"
+    }
     fun fetchStatValues() : Map<String, Double> {
         val stats = getStatNames()
-        var returnMap = mutableMapOf<String, Double>()
-        val year = R.integer.year
+        val returnMap = mutableMapOf<String, Double>()
 
         skrape(HttpFetcher) {
-            request {url = getURL()}
+            val URL = getURL()
+            request {url = URL}
 
             response {
                 htmlDocument {
@@ -34,8 +38,9 @@ abstract class Entity() {
         }
         return returnMap
     }
-
-    abstract fun getURL() : String
+    open fun getURL() : String {
+        return baseURL
+    }
     abstract fun getStatNames() : Set<String>
 
     open fun addLocalStat(name : String) {

@@ -1,5 +1,6 @@
 package com.example.nflstats.model
 import com.example.nflstats.R
+import java.util.Calendar
 
 data class Player(val fName : String, val lName : String, val playerID : String) : Entity() {
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
@@ -13,7 +14,11 @@ data class Player(val fName : String, val lName : String, val playerID : String)
     /**
      * Returns URL linking to player splits for year
      */
-    override fun getURL() : String { return "https://www.pro-football-reference.com/players/$playerID/splits/${R.integer.year}/" }
+    override fun getURL() : String {
+        val year = Calendar.getInstance().get(Calendar.YEAR) - 1
+
+        return super.getURL() + "/players/$playerID/splits/$year/"
+    }
 
     fun fetchPlayers(): Set<String> {
         throw NotImplementedError()
