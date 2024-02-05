@@ -42,7 +42,9 @@ class Maps() {
     //set of stats that can be displayed, as well their pro-football reference data-stat values
     val dataStatMap : Map<String, String> = mapOf(
         "3rd Down %" to "third_down_pct",
-        "4th Down %" to "fourth_down_pct"
+        "4th Down %" to "fourth_down_pct",
+        "Joe Burrow" to "player",
+        "red zone" to "red_zone_att"
     )
 
     //maps teams to image resources

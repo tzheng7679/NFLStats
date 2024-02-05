@@ -1,6 +1,11 @@
 package com.example.nflstats.model
 import com.example.nflstats.R
-import java.util.Calendar
+import it.skrape.core.htmlDocument
+import it.skrape.fetcher.HttpFetcher
+import it.skrape.fetcher.response
+import it.skrape.fetcher.skrape
+import it.skrape.selects.html5.a
+import it.skrape.selects.html5.td
 
 data class Player(val fName : String, val lName : String, val playerID : String) : Entity() {
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
@@ -15,17 +20,30 @@ data class Player(val fName : String, val lName : String, val playerID : String)
      * Returns URL linking to player splits for year
      */
     override fun getURL() : String {
-        val year = Calendar.getInstance().get(Calendar.YEAR) - 1
-
-        return super.getURL() + "/players/$playerID/splits/$year/"
+        return super.getURL() + "players/$playerID/splits/${getYear()}/"
     }
 
-    fun fetchPlayers(): Set<String> {
-        throw NotImplementedError()
-    }
+    fun fetchTeam(): String {
+        val year = getYear()
+        var team : String = ""
 
-    fun fetchDivisionPlace(): String {
-        throw NotImplementedError()
+        skrape(HttpFetcher) {
+            request {url = getURL()}
+
+            response {
+                htmlDocument {
+                    a {
+                        withAttribute = "href" to "/teams/cin/$year.htm"
+
+                        findFirst {
+                            team = text
+                        }
+                    }
+                }
+            }
+        }
+
+        return team
     }
 
     override fun getStatNames(): Set<String> { return globalPlayerStats union uniqueAdds subtract uniqueSubs }

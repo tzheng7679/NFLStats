@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nflstats.model.Maps
+import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
 
 //maps city abb. to team logos
@@ -47,7 +48,14 @@ class MainActivity : ComponentActivity() {
             ) {
                 val bengals = Team(city = "cin", name = "bengals")
                 bengals.addLocalStat("3rd Down %")
-                Text(text = bengals.fetchStatValues().toString())
+                bengals.addLocalStat("red zone")
+                Column {
+                    Text(text = bengals.fetchStatValues().toString())
+
+
+                    val joey = Player("Joe", "Burrow", "B/Burr/Jo01.htm")
+                    Text(text = joey.fetchTeam())
+                }
             }
         }
     }
