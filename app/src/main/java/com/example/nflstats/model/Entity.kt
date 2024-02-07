@@ -63,13 +63,13 @@ abstract class Entity() {
     fun fetchStatValues(context : Context) : Any {//Map<String, Double> {
         val queue = Volley.newRequestQueue(context)
         var text: Any
-        val url = "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2021/types/2/teams/24/statistics"
+        val url = "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2021/types/2/teams/23/statistics"
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, url, null,
 
             { response -> //onResponse
-                val x :JSONObject = response
-                Log.d("HelpMe", x.toString())
+                val y = response
+                Log.d("HelpMe", y["splits.categories.0.name"].toString())
             },
 
             { error ->
