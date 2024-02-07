@@ -3,42 +3,6 @@ package com.example.nflstats.model
 import com.example.nflstats.R
 
 class Maps() {
-    //maps my city abbreviations to pfr ones
-    val pfrAbbrMap : Map<String, String> = mapOf(
-        "ari" to "crd",
-        "atl" to "atl",
-        "bal" to "rav",
-        "buf" to "buf",
-        "car" to "car",
-        "chi" to "chi",
-        "cin" to "cin",
-        "cle" to "cle",
-        "dal" to "dal",
-        "den" to "den",
-        "det" to "det",
-        "gb" to "gnb",
-        "hou" to "htx",
-        "ind" to "clt",
-        "jax" to "jax",
-        "kc" to "kan",
-        "lac" to "sdg",
-        "lar" to "ram",
-        "lv" to "rai",
-        "mia" to "mia",
-        "min" to "min",
-        "ne" to "nwe",
-        "no" to "nor",
-        "nyg" to "nyg",
-        "nyj" to "nyj",
-        "phi" to "phi",
-        "pit" to "pit",
-        "sea" to "sea",
-        "sf" to "sfo",
-        "tb" to "tam",
-        "ten" to "oti",
-        "was" to "was",
-    )
-
     //set of stats that can be displayed, as well their pro-football reference data-stat values
     val dataStatMap : Map<String, String> = mapOf(
         "3rd Down %" to "third_down_pct",
@@ -80,7 +44,7 @@ class Maps() {
         "sf" to R.drawable.sf,
         "tb" to R.drawable.tb,
         "ten" to R.drawable.ten,
-        "was" to R.drawable.was,
+        "wsh" to R.drawable.was,
     )
 
     //maps teams to full names
@@ -116,7 +80,7 @@ class Maps() {
         "sf" to "San Francisco 49ers",
         "tb" to "Tampa Bay Buccaneers",
         "ten" to "Tennessee Titans",
-        "was" to "Washington Commanders",
+        "wsh" to "Washington Commanders",
     )
 
     val abbr = (teamImageMap.keys).toList()

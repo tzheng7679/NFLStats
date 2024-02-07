@@ -97,4 +97,7 @@ dependencies {
 
     //Web-scraping toolkit
     implementation("it.skrape:skrapeit:1.2.2")
+
+    //API requester
+    implementation("com.android.volley:volley:1.2.1")
 }
