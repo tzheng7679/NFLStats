@@ -1,7 +1,13 @@
 package com.example.nflstats.model
 
 import android.content.Context
+import android.util.JsonReader
 import android.util.Log
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
@@ -60,26 +66,30 @@ abstract class Entity() {
         return returnMap
     }
      */
-    fun fetchStatValues(context : Context) : Any {//Map<String, Double> {
+    @Composable
+    fun fetchStatValues(context : Context) {//Map<String, Double> {
         val queue = Volley.newRequestQueue(context)
-        var text: Any
-        val url = "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2021/types/2/teams/23/statistics"
+        val url = "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2021/types/2/teams/24/statistics"
+
+        val text by remember { mutableStateOf(JSONObject()) }
+        Text(text = text.toString())
+
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, url, null,
-
             { response -> //onResponse
-                val y = response
-                Log.d("HelpMe", y["splits.categories.0.name"].toString())
+                val text = response
+                val z = response.getJSONObject("splits")
+                Log.d("HelpMe", text["splits.categories.0.name"].toString())
             },
 
             { error ->
+                Log.d("HelpMe", error.stackTraceToString())
                 Log.d("HelpMe", "Could not retrieve statistics from API")
             }
         )
 
         queue.add(jsonObjectRequest)
         queue.stop()
-        return ""
     }
 
     /**
