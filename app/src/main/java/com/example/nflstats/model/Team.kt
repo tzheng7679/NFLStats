@@ -18,6 +18,7 @@ data class Team(val city : String, val name : String) : Entity() {
     //set of stats that will be displayed for all teams
     companion object {
         var globalTeamStats = mutableSetOf<String>()
+        val baseURL = "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2023/types/2/teams/12/"
     }
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
     override var uniqueSubs : MutableSet<String> = mutableSetOf()

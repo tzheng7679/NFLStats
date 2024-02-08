@@ -29,43 +29,37 @@ abstract class Entity() {
 
     //set of maps and base string for PFR URL
     companion object {
-        val Maps = Maps()
-        const val baseURL = "https://www.pro-football-reference.com/"
-    }
+        /**
+         * Returns the the season to be accessed (assuming that the season kicks off on the first Thus. after labor day
+         */
+        fun getSeason() : Int {
+            val cal = Calendar.getInstance()
+            cal.set(2002, 8, 6)
 
-    /**
-     * Returns current year for URL constructing purpoess
-     */
-    fun getYear() : Int {
-        return Calendar.getInstance().get(Calendar.YEAR) - 1
-    }
+            val month = cal.get(Calendar.MONTH)
+            val year = cal.get(Calendar.YEAR)
+            val day = cal.get(Calendar.DAY_OF_MONTH)
 
-    /**
-     * Returns Map of String stats and their Double value scraped from PFR
-     */
-    /*
-    fun fetchStatValues() : Map<String, Double> {
-        val stats = getStatNames()
-        val returnMap = mutableMapOf<String, Double>()
+            //if before season
+            if(month < 8 || day < 4) return year - 1
+            //if after kickoff day
+            if(month > 8 || day > 10) return year
 
-        skrape(HttpFetcher) {
-            val URL = getURL()
-            request {url = URL}
-
-            response {
-                htmlDocument {
-                    stats.forEach { it ->
-                        td {
-                            withAttribute = "data-stat" to Maps.dataStatMap[it]!!
-                            findFirst { returnMap[it] = text.toDouble() }
-                        }
-                    }
-                }
+            cal.set(year, 8, 1)
+            var laborDayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
+            var laborDay = 1
+            while(laborDayOfWeek != Calendar.MONDAY) {
+                laborDay += 1
+                laborDayOfWeek += 1
             }
+
+            //if past kickoff day, then return current year; else return past year
+            if(day > laborDay + 3) return year
+
+            return year - 1
         }
-        return returnMap
     }
-     */
+
     @Composable
     fun fetchStatValues(context : Context) {//Map<String, Double> {
         val queue = Volley.newRequestQueue(context)
@@ -95,9 +89,7 @@ abstract class Entity() {
     /**
      * Super method that returns base url for child objects
      */
-    open fun getURL() : String {
-        return baseURL
-    }
+    abstract fun getURL() : String
 
     /**
      * Returns Set of string name for stats for this object
@@ -107,10 +99,7 @@ abstract class Entity() {
     /**
      * Adds local stat to Entity
      */
-    open fun addLocalStat(name : String) {
-        if (name !in Maps.dataStatMap.keys) throw Exception("DNE")
-        uniqueAdds.add(name)
-    }
+    open fun addLocalStat(name : String) { uniqueAdds.add(name) }
 
     /**
      * Removes local stat from Entity
