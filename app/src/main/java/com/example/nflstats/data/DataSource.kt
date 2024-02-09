@@ -75,3 +75,38 @@ val teamNameMap : Map<String, String> = mapOf(
 )
 
 val abbr = (teamImageMap.keys).toList()
+
+val abbrToID: Map<String, Int> = mapOf(
+    "ari" to 22,
+    "atl" to 1,
+    "bal" to 33,
+    "buf" to 2,
+    "car" to 29,
+    "chi" to 3,
+    "cin" to 4,
+    "cle" to 5,
+    "dal" to 6,
+    "den" to 7,
+    "det" to 8,
+    "gb" to 9,
+    "hou" to 34,
+    "ind" to 11,
+    "jax" to 30,
+    "kc" to 12,
+    "lac" to 13,
+    "lar" to 24,
+    "lv" to 14,
+    "mia" to 15,
+    "min" to 16,
+    "ne" to 17,
+    "no" to 18,
+    "nyg" to 19,
+    "nyj" to 20,
+    "phi" to 21,
+    "pit" to 23,
+    "sea" to 26,
+    "sf" to 25,
+    "tb" to 27,
+    "ten" to 10,
+    "wsh" to 28
+)

@@ -14,7 +14,7 @@ import it.skrape.selects.text
 /**
  * Represents a Team located in "city" (must be in lowercase short abbreviation)
  */
-data class Team(val city : String, val name : String) : Entity() {
+class Team(val city : String, val name : String) : Entity() {
     //set of stats that will be displayed for all teams
     companion object {
         var globalTeamStats = mutableSetOf<String>()
