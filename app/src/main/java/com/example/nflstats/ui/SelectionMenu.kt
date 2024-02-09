@@ -32,12 +32,13 @@ import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Teams
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Team
+import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
-import com.example.nflstats.ui.theme.defaultImageModifier
+import com.example.nflstats.ui.theme.defaultTeamImageModifier
 
 
 @Composable
-fun SelectionMenu(entities : List<Entity>, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardModifier : Modifier) {
+fun SelectionMenu(entities : List<Entity>, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardModifier : Modifier = defaultCardModifier, modifier: Modifier = Modifier) {
     LazyColumn {
         val roundedCorner = 40.dp
         val cardMod = Modifier
@@ -58,7 +59,7 @@ fun SelectionMenu(entities : List<Entity>, onCardClick : (Entity) -> Unit, image
 @Composable
 @Preview
 fun SelectionPreview() {
-    SelectionMenu(Teams.entries.map { Team(it) }, {}, defaultImageModifier, defaultCardModifier)
+    SelectionMenu(Teams.entries.map { Team(it) }, {}, imageModifier = defaultTeamImageModifier, defaultCardModifier)
 }
 @Composable
 fun EntityCard(entity : Entity, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardMod : Modifier) {
@@ -67,13 +68,10 @@ fun EntityCard(entity : Entity, onCardClick : (Entity) -> Unit, imageModifier : 
     ) {
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             Spacer(Modifier.width(20.dp))
-            Image(
-                modifier = imageModifier,
-                painter = painterResource(id = entity.imageID),
-                contentDescription = ""
-            )
 
-            val formattedName: Pair<String, String> = entity.getFormattedName()
+            imageCircle(id = entity.imageID)
+
+            val formattedName: Pair<String, String> = entity.formattedName
             Column {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
@@ -98,5 +96,5 @@ fun EntityCard(entity : Entity, onCardClick : (Entity) -> Unit, imageModifier : 
 @Composable
 @Preview
 fun EntityCardPreview() {
-    EntityCard(entity = Team(Teams.BUF), onCardClick = {}, imageModifier = defaultImageModifier, cardMod = defaultCardModifier)
+    EntityCard(entity = Team(Teams.BUF), onCardClick = {}, imageModifier = defaultTeamImageModifier, cardMod = defaultCardModifier)
 }

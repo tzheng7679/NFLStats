@@ -10,9 +10,11 @@ import it.skrape.selects.html5.td
 /**
  * Represents an NFL player
  */
-class Player(val fName : String, val lName : String, val playerID : String, imageID : Int) : Entity(imageID) {
+class Player(val fName : String, val lName : String, val playerID : Int, imageID : Int) : Entity(imageID) {
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
     override var uniqueSubs : MutableSet<String> = mutableSetOf()
+    override val formattedName: Pair<String, String>
+        get() = Pair(fName, lName)
 
     //set of stats that will be displayed for all players
     companion object {
@@ -34,8 +36,4 @@ class Player(val fName : String, val lName : String, val playerID : String, imag
 
     fun addGlobalStat(name : String) { Team.globalTeamStats.add(name) }
     fun removeGlobalStat(name : String) { Team.globalTeamStats.remove(name) }
-
-    override fun getFormattedName() : Pair<String, String> {
-        return Pair(fName, lName)
-    }
 }

@@ -6,4 +6,5 @@
     <string name="view_stats_for_a_team">View Stats for a Team</string>
     <string name="change_statistics_shown">Change statistics shown</string>
     <string name="view_stats_for_a_player">View Stats for a Player</string>
+    <string name="stat_view_menu">Stat View Menu</string>
 </resources>

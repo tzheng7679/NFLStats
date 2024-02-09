@@ -24,6 +24,13 @@ class Team(val abbr : Teams, imageID : Int = teamImageMap[abbr] ?: 0) : Entity(i
     }
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
     override var uniqueSubs : MutableSet<String> = mutableSetOf()
+    override val formattedName: Pair<String, String>
+            get() {
+                val x = teamNameMap[abbr]!!
+                val z = x.lastIndexOf(" ")
+
+                return Pair(x.substring(0, z), x.substring(z + 1))
+            }
 
     /**
      * Returns URL linking to player splits for year
@@ -50,11 +57,4 @@ class Team(val abbr : Teams, imageID : Int = teamImageMap[abbr] ?: 0) : Entity(i
 
     fun addGlobalStat(name : String) { globalTeamStats.add(name) }
     fun removeGlobalStat(name : String) { globalTeamStats.remove(name) }
-
-    override fun getFormattedName() : Pair<String, String> {
-        val x = teamNameMap[abbr]!!
-        val z = x.lastIndexOf(" ")
-
-        return Pair(x.substring(0, z), x.substring(z + 1))
-    }
 }

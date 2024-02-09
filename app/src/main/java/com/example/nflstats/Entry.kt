@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.example.nflstats.data.UIState
 import com.example.nflstats.ui.theme.NFLStatsTheme
 import com.example.nflstats.ui.SelectionMenu
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class Entry : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +22,8 @@ class Entry : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NFLStatsScreen()
+                    val uiState = MutableStateFlow(UIState(currEntity = null))
+                    NFLStatsScreen(uiState = uiState)
                 }
             }
         }
