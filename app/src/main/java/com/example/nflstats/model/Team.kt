@@ -1,5 +1,8 @@
 package com.example.nflstats.model
 import com.example.nflstats.R
+import com.example.nflstats.data.Teams
+import com.example.nflstats.data.teamImageMap
+import com.example.nflstats.data.teamNameMap
 import it.skrape.core.htmlDocument
 import it.skrape.fetcher.HttpFetcher
 import it.skrape.fetcher.response
@@ -14,11 +17,10 @@ import it.skrape.selects.text
 /**
  * Represents a Team located in "city" (must be in lowercase short abbreviation)
  */
-class Team(val city : String, val name : String) : Entity() {
+class Team(val abbr : Teams, imageID : Int = teamImageMap[abbr] ?: 0) : Entity(imageID) {
     //set of stats that will be displayed for all teams
     companion object {
         var globalTeamStats = mutableSetOf<String>()
-        val baseURL = "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2023/types/2/teams/12/"
     }
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
     override var uniqueSubs : MutableSet<String> = mutableSetOf()
@@ -27,7 +29,7 @@ class Team(val city : String, val name : String) : Entity() {
      * Returns URL linking to player splits for year
      */
     override fun getURL() : String {
-        throw NotImplementedError()
+        return "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/${getSeason()}/types/2/teams/"
     }
 
     /**
@@ -48,4 +50,11 @@ class Team(val city : String, val name : String) : Entity() {
 
     fun addGlobalStat(name : String) { globalTeamStats.add(name) }
     fun removeGlobalStat(name : String) { globalTeamStats.remove(name) }
+
+    override fun getFormattedName() : Pair<String, String> {
+        val x = teamNameMap[abbr]!!
+        val z = x.lastIndexOf(" ")
+
+        return Pair(x.substring(0, z), x.substring(z + 1))
+    }
 }

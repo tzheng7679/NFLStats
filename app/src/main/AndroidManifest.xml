@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NFLStats"
         tools:targetApi="31">
-        <activity android:name=".MainActivity"
+        <activity android:name=".Entry"
             android:exported = "true"
             android:label = "Main activity">
             <intent-filter>

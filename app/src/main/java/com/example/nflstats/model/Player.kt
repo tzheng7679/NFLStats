@@ -7,7 +7,10 @@ import it.skrape.fetcher.skrape
 import it.skrape.selects.html5.a
 import it.skrape.selects.html5.td
 
-data class Player(val fName : String, val lName : String, val playerID : String) : Entity() {
+/**
+ * Represents an NFL player
+ */
+class Player(val fName : String, val lName : String, val playerID : String, imageID : Int) : Entity(imageID) {
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
     override var uniqueSubs : MutableSet<String> = mutableSetOf()
 
@@ -20,34 +23,19 @@ data class Player(val fName : String, val lName : String, val playerID : String)
      * Returns URL linking to player splits for year
      */
     override fun getURL() : String {
-        return super.getURL() + "players/$playerID/splits/${getYear()}/"
+        return "https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/athletes/${playerID}"
     }
 
     fun fetchTeam(): String {
-        val year = getYear()
-        var team : String = ""
-
-        skrape(HttpFetcher) {
-            request {url = getURL()}
-
-            response {
-                htmlDocument {
-                    a {
-                        withAttribute = "href" to "/teams/cin/$year.htm"
-
-                        findFirst {
-                            team = text
-                        }
-                    }
-                }
-            }
-        }
-
-        return team
+        throw NotImplementedError()
     }
 
     override fun getStatNames(): Set<String> { return globalPlayerStats union uniqueAdds subtract uniqueSubs }
 
     fun addGlobalStat(name : String) { Team.globalTeamStats.add(name) }
     fun removeGlobalStat(name : String) { Team.globalTeamStats.remove(name) }
+
+    override fun getFormattedName() : Pair<String, String> {
+        return Pair(fName, lName)
+    }
 }

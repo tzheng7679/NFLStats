@@ -1,7 +1,6 @@
 package com.example.nflstats.model
 
 import android.content.Context
-import android.util.JsonReader
 import android.util.Log
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -9,20 +8,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.example.nflstats.MainActivity
-import com.example.nflstats.R
-import it.skrape.core.htmlDocument
-import it.skrape.fetcher.HttpFetcher
-import it.skrape.fetcher.response
-import it.skrape.fetcher.skrape
-import it.skrape.selects.html5.td
 import org.json.JSONObject
 import java.util.Calendar
 
-abstract class Entity() {
+abstract class Entity(val imageID : Int) {
     //Have globalStats as the java equivalent of a static variable
     abstract var uniqueAdds : MutableSet<String>
     abstract var uniqueSubs : MutableSet<String>
@@ -105,4 +96,6 @@ abstract class Entity() {
      * Removes local stat from Entity
      */
     open fun removeLocalStat(name : String) { uniqueSubs.remove(name) }
+
+    abstract fun getFormattedName() : Pair<String, String>
 }
