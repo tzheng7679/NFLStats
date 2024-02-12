@@ -84,7 +84,7 @@ fun NFLStatsScreen(
             viewModel.setStats(currEntity.fetchStatValues(context = LocalContext.current))
             val stats = uiState.currStats
 
-            StatViewMenu(uiState = uiState, "secondary filler")
+            StatViewMenu(uiState = uiState)
         }
     }
 }
