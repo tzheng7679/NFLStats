@@ -3,6 +3,7 @@ package com.example.nflstats
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -10,8 +11,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.nflstats.data.StatViewModel
 import com.example.nflstats.data.Teams
-import com.example.nflstats.data.UIState
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
@@ -21,6 +22,7 @@ import com.example.nflstats.ui.SelectionMenu
 import com.example.nflstats.ui.StatViewMenu
 import com.example.nflstats.ui.theme.defaultPlayerImageModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -32,7 +34,11 @@ enum class Menus(@StringRes val title : Int) {
 }
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun NFLStatsScreen(navController: NavHostController = rememberNavController(), uiState : MutableStateFlow<UIState>) {
+fun NFLStatsScreen(
+    viewModel: StatViewModel = viewModel(),
+    navController: NavHostController = rememberNavController()
+) {
+    val uiState by viewModel.uiState.collectAsState()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Menus.valueOf(backStackEntry?.destination?.route ?: Menus.MainMenu.name)
 
@@ -50,11 +56,13 @@ fun NFLStatsScreen(navController: NavHostController = rememberNavController(), u
             //IMPORTANT *******************
             //NOTE: CHANGE OPTIONS LATER SO IT USES SYSTEM STORED OBJECTS, NOT NEWLY CREATED ONES
             //IMPORTANT *******************
+            val context = LocalContext.current
             val options = Teams.entries.map { Team(it) }
             SelectionMenu(
                 entities = options,
                 onCardClick = { entity ->
-                    uiState.update { it.copy(currEntity = entity) }
+                    viewModel.setEntity(entity)
+                    viewModel.setStats(entity.fetchStatValues(context = context))
                     navController.navigate(Menus.StatViewMenu.name)
                               },
                 imageModifier = defaultTeamImageModifier
@@ -72,10 +80,11 @@ fun NFLStatsScreen(navController: NavHostController = rememberNavController(), u
 
         //Route for going to see the
         composable(route = Menus.StatViewMenu.name) {
-            val currEntity = uiState.value.currEntity ?: Player("Error", "Player could not be fetched", imageID = teamImageMap[Teams.WSH]!!, playerID = 0)
-            val stats = currEntity.fetchStatValues(context = LocalContext.current)
+            val currEntity = uiState.currEntity ?: Player("Error", "Player could not be fetched", imageID = teamImageMap[Teams.WSH]!!, playerID = 0)
+            viewModel.setStats(currEntity.fetchStatValues(context = LocalContext.current))
+            val stats = uiState.currStats
 
-            StatViewMenu(entity = currEntity, stats = stats, "secondary filler")
+            StatViewMenu(uiState = uiState, "secondary filler")
         }
     }
 }

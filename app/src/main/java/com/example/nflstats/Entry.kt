@@ -22,8 +22,7 @@ class Entry : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val uiState = MutableStateFlow(UIState(currEntity = null))
-                    NFLStatsScreen(uiState = uiState)
+                    NFLStatsScreen()
                 }
             }
         }

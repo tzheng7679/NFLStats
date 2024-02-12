@@ -13,6 +13,7 @@ import it.skrape.selects.html5.td
 class Player(val fName : String, val lName : String, val playerID : Int, imageID : Int) : Entity(imageID) {
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
     override var uniqueSubs : MutableSet<String> = mutableSetOf()
+
     override val formattedName: Pair<String, String>
         get() = Pair(fName, lName)
 

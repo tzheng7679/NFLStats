@@ -24,6 +24,7 @@ class Team(val abbr : Teams, imageID : Int = teamImageMap[abbr] ?: 0) : Entity(i
     }
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
     override var uniqueSubs : MutableSet<String> = mutableSetOf()
+
     override val formattedName: Pair<String, String>
             get() {
                 val x = teamNameMap[abbr]!!

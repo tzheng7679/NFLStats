@@ -18,6 +18,8 @@ abstract class Entity(val imageID : Int) {
     abstract var uniqueAdds : MutableSet<String>
     abstract var uniqueSubs : MutableSet<String>
     abstract val formattedName : Pair<String, String>
+    var secondaryInformation : String = "FILLER"
+
     //set of maps and base string for PFR URL
     companion object {
         /**
@@ -51,7 +53,6 @@ abstract class Entity(val imageID : Int) {
         }
     }
 
-    @Composable
     fun fetchStatValues(context : Context) : Map<String, Pair<Double, String>> {
         /*
         val queue = Volley.newRequestQueue(context)
