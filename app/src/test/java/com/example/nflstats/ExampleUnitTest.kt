@@ -1,5 +1,7 @@
 package com.example.nflstats
 
+import com.example.nflstats.data.Teams
+import com.example.nflstats.model.Team
 import org.junit.Test
 
 import org.junit.Assert.*

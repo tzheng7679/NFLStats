@@ -10,7 +10,8 @@ import it.skrape.selects.html5.td
 /**
  * Represents an NFL player
  */
-class Player(val fName : String, val lName : String, val playerID : Int, imageID : Int) : Entity(imageID) {
+
+class Player(val fName : String, val lName : String, override val id : Int, imageID : Int) : Entity(imageID) {
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
     override var uniqueSubs : MutableSet<String> = mutableSetOf()
 
@@ -25,8 +26,8 @@ class Player(val fName : String, val lName : String, val playerID : Int, imageID
     /**
      * Returns URL linking to player splits for year
      */
-    override fun getURL() : String {
-        return "https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/athletes/${playerID}"
+    override fun getURLAddition() : String {
+        return "${id}/statistics?lang=en&region=us/"
     }
 
     fun fetchTeam(): String {

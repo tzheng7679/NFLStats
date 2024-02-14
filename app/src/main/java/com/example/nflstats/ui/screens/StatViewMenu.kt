@@ -1,4 +1,4 @@
-package com.example.nflstats.ui
+package com.example.nflstats.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,15 +15,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.UIState
 import com.example.nflstats.data.teamImageMap
@@ -38,7 +37,14 @@ import com.example.nflstats.ui.theme.defaultCardModifier
  * Creates menu for viewing stats for [player], with stats [stats.keys] of values [stats.values.first] with description [stats.values.second]
  */
 @Composable
-fun StatViewMenu(uiState: UIState, modifier: Modifier = Modifier) {
+fun StatViewMenu(uiState: UIState, modifier: Modifier = Modifier) = when(uiState.status) {
+        Status.SUCCESS -> SuccessMenu(uiState = uiState)
+        Status.LOADING -> LoadingMenu()
+        Status.FAILURE -> FailureMenu()
+    }
+
+@Composable
+fun SuccessMenu(uiState: UIState, modifier: Modifier = Modifier) {
     val entity = uiState.currEntity ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
     val stats = uiState.currStats ?: mapOf<String, Pair<Double, String>>()
 
@@ -58,10 +64,21 @@ fun StatViewMenu(uiState: UIState, modifier: Modifier = Modifier) {
 }
 
 @Composable
+@Preview(showBackground = true)
+fun LoadingMenu() {
+    Text(text = "Loading...")
+}
+
+@Composable
+@Preview(showBackground = true)
+fun FailureMenu() {
+    Text(text = "Sorry, but stats could not retreived at this time")
+}
+
+@Composable
 @Preview
 fun StatViewMenuPreview() {
-    val entity = Player("Patrick", "Mahomes", playerID = 3139477, imageID = teamImageMap[Teams.KC]!!)
-    val stats = mapOf<String, Pair<Double, String>>(
+    val sampleStats = mapOf<String, Pair<Double, String>>(
         "Completion Percentage" to Pair(67.3, "The percent of passes completed"),
         "Passing Yards" to Pair(4183.0, "The amount of yards passing"),
         "Passing Touchdowns" to Pair(27.0, "The amount of touchdowns the player threw"),
@@ -71,21 +88,8 @@ fun StatViewMenuPreview() {
         "Passing LNG" to Pair(67.0, "Longest passing play"),
         "Sacks" to Pair(27.0, "Amount of sacks taken")
     )
-    val secondaryInformation = "FILLER"
-
-    Scaffold(
-        topBar = @Composable { Header(entity = Team(Teams.WSH), secondaryInformation = secondaryInformation) },
-        modifier = Modifier
-    ) {
-        LazyColumn(modifier = Modifier.padding(it)) {
-            stats.forEach {
-                item {
-                    Spacer(modifier = Modifier.height(5.dp))
-                    StatCard(name = it.key, value = it.value.first, description = it.value.second)
-                }
-            }
-        }
-    }
+    val x = Team(Teams.WSH)
+    StatViewMenu(uiState = UIState(currEntity = x, currStats = sampleStats, status = Status.SUCCESS))
 }
 
 @Composable
@@ -126,8 +130,8 @@ fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formatte
                 //THANKS DAN SNYDER, for making me write something to change the font size
                 val secondFontSize : Double = calculateHeaderFontSize(
                     name = formattedName.second,
-                    maxFont = 15.0,
-                    maxScore = 8.0
+                    maxFont = 13.0,
+                    maxScore = 7.0
                 ) { it.length.toDouble() }
 
                 //Team nickname
@@ -152,7 +156,6 @@ fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formatte
         }
     }
 }
-
 @Composable
 @Preview(showBackground = true)
 fun HeaderPreview() {
@@ -196,7 +199,6 @@ fun StatCard(name : String, value : Double, description : String) {
         }
     }
 }
-
 @Composable
 @Preview
 fun StatCardPreview() {
@@ -211,7 +213,6 @@ private fun calculateHeaderFontSize(name: String, maxFont: Double, maxScore: Dou
         else -> maxFont
     }
 }
-
 private fun calculateStatCardBaseFontSize(name : String, value : String, maxFont : Double, maxLengthScore : Double, multiplier : Double) : Double {
     val lengthScore = name.length + (multiplier * 1.1) * value.length
     return when {

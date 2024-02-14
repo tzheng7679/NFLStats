@@ -20,3 +20,12 @@ fun imageCircle(id : Int, isPlayer : Boolean = false) {
         contentDescription = ""
     )
 }
+
+@Composable
+fun imageCircle(id : Int, imageModifier: Modifier) {
+    Image(
+        modifier = imageModifier,
+        painter = painterResource(id = id),
+        contentDescription = ""
+    )
+}

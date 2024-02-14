@@ -17,14 +17,12 @@ import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
-import com.example.nflstats.ui.MainMenu
-import com.example.nflstats.ui.SelectionMenu
-import com.example.nflstats.ui.StatViewMenu
+import com.example.nflstats.ui.screens.MainMenu
+import com.example.nflstats.ui.screens.SelectionMenu
+import com.example.nflstats.ui.screens.StatViewMenu
 import com.example.nflstats.ui.theme.defaultPlayerImageModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 
 enum class Menus(@StringRes val title : Int) {
     MainMenu(R.string.main_menu),
@@ -62,7 +60,6 @@ fun NFLStatsScreen(
                 entities = options,
                 onCardClick = { entity ->
                     viewModel.setEntity(entity)
-                    viewModel.setStats(entity.fetchStatValues(context = context))
                     navController.navigate(Menus.StatViewMenu.name)
                               },
                 imageModifier = defaultTeamImageModifier
@@ -78,12 +75,8 @@ fun NFLStatsScreen(
             )
         }
 
-        //Route for going to see the
+        //Route for going to see the statistics for a team (assumes that the stats have already been set)
         composable(route = Menus.StatViewMenu.name) {
-            val currEntity = uiState.currEntity ?: Player("Error", "Player could not be fetched", imageID = teamImageMap[Teams.WSH]!!, playerID = 0)
-            viewModel.setStats(currEntity.fetchStatValues(context = LocalContext.current))
-            val stats = uiState.currStats
-
             StatViewMenu(uiState = uiState)
         }
     }

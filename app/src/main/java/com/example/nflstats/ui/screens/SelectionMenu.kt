@@ -1,8 +1,7 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.nflstats.ui
+package com.example.nflstats.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -22,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Teams
 import com.example.nflstats.model.Entity
+import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
 import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
@@ -69,7 +68,7 @@ fun EntityCard(entity : Entity, onCardClick : (Entity) -> Unit, imageModifier : 
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             Spacer(Modifier.width(20.dp))
 
-            imageCircle(id = entity.imageID)
+            imageCircle(id = entity.imageID, isPlayer = entity is Player)
 
             val formattedName: Pair<String, String> = entity.formattedName
             Column {

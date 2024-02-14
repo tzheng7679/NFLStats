@@ -37,6 +37,12 @@ enum class Teams {
     WSH
 }
 
+enum class Status {
+    SUCCESS,
+    LOADING,
+    FAILURE
+}
+
 //maps teams to image resources
 val teamImageMap : Map<Teams, Int> = mapOf(
     Teams.ARI to R.drawable.ari,

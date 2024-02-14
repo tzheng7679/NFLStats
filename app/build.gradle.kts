@@ -99,7 +99,11 @@ dependencies {
     implementation("it.skrape:skrapeit:1.2.2")
 
     //API requester
-    implementation("com.android.volley:volley:1.2.1")
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // Retrofit with Scalar Converter
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
 
     //Navigation dependencies
     val nav_version = "2.7.4"

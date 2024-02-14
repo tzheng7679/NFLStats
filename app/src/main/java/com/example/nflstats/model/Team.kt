@@ -1,6 +1,7 @@
 package com.example.nflstats.model
 import com.example.nflstats.R
 import com.example.nflstats.data.Teams
+import com.example.nflstats.data.abbrToID
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.data.teamNameMap
 import it.skrape.core.htmlDocument
@@ -18,6 +19,9 @@ import it.skrape.selects.text
  * Represents a Team located in "city" (must be in lowercase short abbreviation)
  */
 class Team(val abbr : Teams, imageID : Int = teamImageMap[abbr] ?: 0) : Entity(imageID) {
+    //The team's id
+    override val id: Int = abbrToID[abbr] ?: 1
+
     //set of stats that will be displayed for all teams
     companion object {
         var globalTeamStats = mutableSetOf<String>()
@@ -36,8 +40,8 @@ class Team(val abbr : Teams, imageID : Int = teamImageMap[abbr] ?: 0) : Entity(i
     /**
      * Returns URL linking to player splits for year
      */
-    override fun getURL() : String {
-        return "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/${getSeason()}/types/2/teams/"
+    override fun getURLAddition() : String {
+        return "teams/${id}/statistics?lang=en&region=us/"
     }
 
     /**
