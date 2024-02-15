@@ -41,6 +41,7 @@ import com.example.nflstats.model.Team
 import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultDescriptionModifier
+import com.example.nflstats.ui.theme.expandedCardModifier
 
 
 /**
@@ -66,7 +67,7 @@ fun SuccessMenu(uiState: UIState, modifier: Modifier = Modifier) {
             stats.forEach {
                 item {
                     Spacer(modifier = Modifier.height(5.dp))
-                    StatCard(name = it.name, value = it.value, description = it.description)
+                    StatCard(it)
                 }
             }
         }
@@ -167,12 +168,19 @@ fun HeaderPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatCard(name : String, value : String, description : String) {
+fun StatCard(stat: Stat) {
+    val name = stat.name
+    val value = stat.value
+    val description = stat.description
+
     var expanded by remember { mutableStateOf(false) }
 
-    val baseFont = calculateStatCardBaseFontSize(name = name, value = value, maxFont = 5.2, maxLengthScore = 30.0, multiplier = 2.7)
+    val baseFont = calculateStatCardBaseFontSize(name = name, value = value, maxFont = 7.0, maxLengthScore = 30.0, multiplier = 2.7)
     Column(verticalArrangement = Arrangement.spacedBy((-12).dp)) {
-        Card(modifier = defaultCardModifier, onClick = { expanded = !expanded }) {
+        Card(
+            modifier = when(expanded) { true -> expandedCardModifier else -> defaultCardModifier },
+            onClick = { expanded = !expanded }
+        ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -183,23 +191,26 @@ fun StatCard(name : String, value : String, description : String) {
                     Text(
                         text = name,
                         fontSize = baseFont.em,
-                        fontStyle = FontStyle.Italic,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1
                     )
-                    //INSERT BAR HERE
+
+                    Text(
+                        text = stat.category,
+                        fontSize = (baseFont * 0.6).em
+                    )
                 }
 
                 Text(
                     text = value,
-                    fontSize = (baseFont * 2.7).em,
+                    fontSize = (baseFont * 2.6).em,
                     fontWeight = FontWeight.ExtraBold,
                     maxLines = 1
                 )
             }
             
             //Description for if card is expanded
-            if (!expanded) {
+            if (expanded) {
                 Card(modifier = defaultDescriptionModifier) {
                     Text(
                         text = description,
@@ -210,10 +221,11 @@ fun StatCard(name : String, value : String, description : String) {
         }
     }
 }
+
 @Composable
 @Preview
 fun StatCardPreview() {
-    StatCard(name = "Passing Yards", value = "4000", description = "Percentage of attempted passes completed")
+    StatCard(Stat("Passing Yards", value = "4000", description = "Percentage of attempted passes completed", category = "Offense"))
 }
 
 private fun calculateHeaderFontSize(name: String, maxFont: Double, maxScore: Double, scoreCalculator: (String) -> Double) : Double {

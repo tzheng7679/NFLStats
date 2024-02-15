@@ -16,6 +16,8 @@ data class Splits(
 
 @Serializable
 data class Category(
+    @SerialName("displayName")
+    val name: String,
     val stats: List<APIStat>
 )
 
@@ -23,5 +25,6 @@ data class Category(
 data class APIStat(
     val displayValue: String,
     val name: String,
-    val description: String,
+    val displayName : String = name,
+    val description: String
 )

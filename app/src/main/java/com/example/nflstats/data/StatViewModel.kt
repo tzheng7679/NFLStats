@@ -42,34 +42,32 @@ class StatViewModel : ViewModel() {
         //request and add stats to [stats]
         viewModelScope.launch {
             try {
-                val season = Entity.getSeason()
-                val id = currEntity.id
-                val type = currEntity.getType()
-                val result: String = ESPNApi.servicer.fetchStatValues(
-                    season = season,
-                    id = id,
-                    type = type
+                //Get JSON
+                val fetched: String = ESPNApi.servicer.fetchStatValues(
+                    season = Entity.getSeason(),
+                    id = currEntity.id,
+                    type = currEntity.getType()
                 )
 
-                Log.d("HelpMe", result)
+                //parse JSON with kotlin deserializer, with unknown keys excluded because we don't need them
                 val json = Json {
                     ignoreUnknownKeys = true
                     isLenient = true
                 }
+                val result = json.decodeFromString<EntityStats>(fetched)
 
-                val resulty = json.decodeFromString<EntityStats>(result)
+                //Duplicate checker -- adds a ([CATEGORY]) at the end if there's a another stat that shares the same name
+                val duplicateChecker = mutableMapOf<String, Stat>()
 
-                resulty?.splits?.categories?.forEach {category ->
+                result.splits.categories.forEach {category ->
+                    val cat = category.name
                     category.stats.forEach {stat ->
-                        stats.add(
-                            Stat(
-                                name = stat.name,
-                                value = stat.displayValue,
-                                description = stat.description
-                            )
-                        )
+                        val statAsObject = Stat(name = stat.displayName, value = stat.displayValue, description = stat.description, category = cat)
+                        stats.add(statAsObject)
                     }
                 }
+
+
 
                 setStatus(status = Status.SUCCESS)
             } catch (e: Exception) {

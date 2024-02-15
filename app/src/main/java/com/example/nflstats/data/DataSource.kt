@@ -152,12 +152,12 @@ val abbrToID: Map<Teams, Int> = mapOf(
 )
 
 val sampleStats = listOf(
-    Stat("Completion Percentage", "67.3", "The percent of passes completed"),
-    Stat("Passing Yards" , "4183", "The amount of yards passing"),
-    Stat("Passing Touchdowns", "27", "The amount of touchdowns the player threw"),
-    Stat("Interceptions", "14", "The amount of interceptions thrown"),
-    Stat("QBR", "63", "The QBR of a quarterback"),
-    Stat("Passer Rating", "92", "Passer rating"),
-    Stat("Passing LNG", "67", "Longest passing play"),
-    Stat("Sacks", "27", "Amount of sacks taken")
+    Stat("Completion Percentage", "67.3", "The percent of passes completed", "Passing"),
+    Stat("Passing Yards" , "4183", "The amount of yards passing", "Passing"),
+    Stat("Passing Touchdowns", "27", "The amount of touchdowns the player threw", "Passing"),
+    Stat("Interceptions", "14", "The amount of interceptions thrown", "Passing"),
+    Stat("QBR", "63", "The QBR of a quarterback", "Passing"),
+    Stat("Passer Rating", "92", "Passer rating", "Passing"),
+    Stat("Passing LNG", "67", "Longest passing play", "Rushing"),
+    Stat("Sacks", "27", "Amount of sacks taken", "Rushing")
 )
