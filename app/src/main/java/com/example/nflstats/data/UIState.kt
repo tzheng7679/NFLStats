@@ -1,5 +1,6 @@
 package com.example.nflstats.data
 
 import com.example.nflstats.model.Entity
+import com.example.nflstats.model.Stat
 
-data class UIState(var currEntity: Entity?, var currStats : Map<String, Pair<Double, String>>?, var status : Status)
+data class UIState(var currEntity: Entity?, var currStats : List<Stat>?, var status : Status)

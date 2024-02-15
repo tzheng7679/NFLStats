@@ -1,6 +1,7 @@
 package com.example.nflstats.data
 
 import com.example.nflstats.R
+import com.example.nflstats.model.Stat
 
 enum class Teams {
     ARI,
@@ -148,4 +149,15 @@ val abbrToID: Map<Teams, Int> = mapOf(
     Teams.TB to 27,
     Teams.TEN to 10,
     Teams.WSH to 28
+)
+
+val sampleStats = listOf(
+    Stat("Completion Percentage", "67.3", "The percent of passes completed"),
+    Stat("Passing Yards" , "4183", "The amount of yards passing"),
+    Stat("Passing Touchdowns", "27", "The amount of touchdowns the player threw"),
+    Stat("Interceptions", "14", "The amount of interceptions thrown"),
+    Stat("QBR", "63", "The QBR of a quarterback"),
+    Stat("Passer Rating", "92", "Passer rating"),
+    Stat("Passing LNG", "67", "Longest passing play"),
+    Stat("Sacks", "27", "Amount of sacks taken")
 )

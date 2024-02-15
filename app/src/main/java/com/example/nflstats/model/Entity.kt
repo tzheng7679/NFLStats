@@ -30,7 +30,6 @@ abstract class Entity(val imageID : Int) {
          */
         fun getSeason() : Int {
             val cal = Calendar.getInstance()
-            cal.set(2002, 8, 6)
 
             val month = cal.get(Calendar.MONTH)
             val year = cal.get(Calendar.YEAR)
@@ -74,8 +73,8 @@ abstract class Entity(val imageID : Int) {
 
     fun getType() : String {
         return when(this) {
-            is Team -> "team"
-            else -> "athlete"
+            is Team -> "teams"
+            else -> "athletes"
         }
     }
 }

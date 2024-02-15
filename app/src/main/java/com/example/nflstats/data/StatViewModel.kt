@@ -1,10 +1,13 @@
 package com.example.nflstats.data
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nflstats.model.Entity
+import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
+import com.example.nflstats.model.json.EntityStats
 import com.example.nflstats.network.ESPNApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import java.lang.Exception
 
 /**
@@ -26,48 +30,58 @@ class StatViewModel : ViewModel() {
      * Updates currEntity to entity, and sets the statistical values to those of the entity
      */
     fun setEntity(entity : Entity) {
-        _uiState.update { it.copy(currEntity = entity,) }
+        _uiState.update { it.copy(currEntity = entity) }
         fetchAndSetStatValues()
     }
 
     private fun fetchAndSetStatValues() {
         val currEntity = _uiState.value.currEntity ?: Team(Teams.WSH)
         setStatus(status = Status.LOADING)
+        val stats = mutableListOf<Stat>()
 
-//        viewModelScope.launch {
-//            try {
-//                val result = ESPNApi.servicer.fetchStatValues(
-//                    season = Entity.getSeason(),
-//                    id = currEntity.id,
-//                    type = currEntity.getType()
-//                )
-//                setStats(values = result)
-//                setStatus(status = Status.SUCCESS)
-//            } catch (e: Exception) {
-//                setStats(values = emptyMap<String, Pair<Double, String>>())
-//                setStatus(status = Status.FAILURE)
-//            }
-//        }
+        //request and add stats to [stats]
+        viewModelScope.launch {
+            try {
+                val season = Entity.getSeason()
+                val id = currEntity.id
+                val type = currEntity.getType()
+                val result: String = ESPNApi.servicer.fetchStatValues(
+                    season = season,
+                    id = id,
+                    type = type
+                )
 
-        runBlocking {
-            delay(500)
+                Log.d("HelpMe", result)
+                val json = Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }
+
+                val resulty = json.decodeFromString<EntityStats>(result)
+
+                resulty?.splits?.categories?.forEach {category ->
+                    category.stats.forEach {stat ->
+                        stats.add(
+                            Stat(
+                                name = stat.name,
+                                value = stat.displayValue,
+                                description = stat.description
+                            )
+                        )
+                    }
+                }
+
+                setStatus(status = Status.SUCCESS)
+            } catch (e: Exception) {
+                setStatus(status = Status.FAILURE)
+                Log.d("HelpMe", e.stackTraceToString())
+            }
         }
 
-        setStats(values = mapOf<String, Pair<Double, String>>(
-            "Completion Percentage" to Pair(67.3, "The percent of passes completed"),
-            "Passing Yards" to Pair(4183.0, "The amount of yards passing"),
-            "Passing Touchdowns" to Pair(27.0, "The amount of touchdowns the player threw"),
-            "Interceptions" to Pair(14.0, "The amount of interceptions thrown"),
-            "QBR" to Pair(63.0, "The QBR of a quarterback"),
-            "Passer Rating" to Pair(92.6, "Passer rating"),
-            "Passing LNG" to Pair(67.0, "Longest passing play"),
-            "Sacks" to Pair(27.0, "Amount of sacks taken")
-        ))
-
-        setStatus(status = Status.SUCCESS)
+        setStats(stats)
     }
 
-    private fun setStats(values : Map<String, Pair<Double, String>>) {
+    private fun setStats(values : List<Stat>) {
         _uiState.update { it.copy(currStats = values) }
     }
 

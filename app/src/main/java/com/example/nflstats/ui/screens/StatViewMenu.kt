@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.nflstats.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
@@ -10,9 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,12 +32,15 @@ import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.UIState
+import com.example.nflstats.data.sampleStats
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
+import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
 import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
+import com.example.nflstats.ui.theme.defaultDescriptionModifier
 
 
 /**
@@ -46,7 +56,7 @@ fun StatViewMenu(uiState: UIState, modifier: Modifier = Modifier) = when(uiState
 @Composable
 fun SuccessMenu(uiState: UIState, modifier: Modifier = Modifier) {
     val entity = uiState.currEntity ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
-    val stats = uiState.currStats ?: mapOf<String, Pair<Double, String>>()
+    val stats = uiState.currStats ?: emptyList<Stat>()
 
     Scaffold(
         topBar = @Composable { Header(entity = entity, secondaryInformation = entity.secondaryInformation) },
@@ -56,7 +66,7 @@ fun SuccessMenu(uiState: UIState, modifier: Modifier = Modifier) {
             stats.forEach {
                 item {
                     Spacer(modifier = Modifier.height(5.dp))
-                    StatCard(name = it.key, value = it.value.first, description = it.value.second)
+                    StatCard(name = it.name, value = it.value, description = it.description)
                 }
             }
         }
@@ -78,16 +88,6 @@ fun FailureMenu() {
 @Composable
 @Preview
 fun StatViewMenuPreview() {
-    val sampleStats = mapOf<String, Pair<Double, String>>(
-        "Completion Percentage" to Pair(67.3, "The percent of passes completed"),
-        "Passing Yards" to Pair(4183.0, "The amount of yards passing"),
-        "Passing Touchdowns" to Pair(27.0, "The amount of touchdowns the player threw"),
-        "Interceptions" to Pair(14.0, "The amount of interceptions thrown"),
-        "QBR" to Pair(63.0, "The QBR of a quarterback"),
-        "Passer Rating" to Pair(92.6, "Passer rating"),
-        "Passing LNG" to Pair(67.0, "Longest passing play"),
-        "Sacks" to Pair(27.0, "Amount of sacks taken")
-    )
     val x = Team(Teams.WSH)
     StatViewMenu(uiState = UIState(currEntity = x, currStats = sampleStats, status = Status.SUCCESS))
 }
@@ -165,44 +165,55 @@ fun HeaderPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatCard(name : String, value : Double, description : String) {
-    val useWhole = value % 1 == 0.0
-    val valueText = (if(useWhole) value.toInt() else value).toString()
+fun StatCard(name : String, value : String, description : String) {
+    var expanded by remember { mutableStateOf(false) }
 
-    val baseFont = calculateStatCardBaseFontSize(name = name, value = valueText, maxFont = 5.2, maxLengthScore = 30.0, multiplier = 2.7)
+    val baseFont = calculateStatCardBaseFontSize(name = name, value = value, maxFont = 5.2, maxLengthScore = 30.0, multiplier = 2.7)
+    Column(verticalArrangement = Arrangement.spacedBy((-12).dp)) {
+        Card(modifier = defaultCardModifier, onClick = { expanded = !expanded }) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+            ) {
+                Column {
+                    Text(
+                        text = name,
+                        fontSize = baseFont.em,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                    //INSERT BAR HERE
+                }
 
-    Card(modifier = defaultCardModifier) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp)
-        ) {
-            Column {
                 Text(
-                    text = name,
-                    fontSize = baseFont.em,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
+                    text = value,
+                    fontSize = (baseFont * 2.7).em,
+                    fontWeight = FontWeight.ExtraBold,
                     maxLines = 1
                 )
-                //INSERT BAR HERE
             }
-
-            Text(
-                text = valueText,
-                fontSize = (baseFont*2.7).em,
-                fontWeight = FontWeight.ExtraBold,
-                maxLines = 1
-            )
+            
+            //Description for if card is expanded
+            if (!expanded) {
+                Card(modifier = defaultDescriptionModifier) {
+                    Text(
+                        text = description,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         }
     }
 }
 @Composable
 @Preview
 fun StatCardPreview() {
-    StatCard(name = "Passing Yards", value = 4000.0, description = "Percentage of attempted passes completed")
+    StatCard(name = "Passing Yards", value = "4000", description = "Percentage of attempted passes completed")
 }
 
 private fun calculateHeaderFontSize(name: String, maxFont: Double, maxScore: Double, scoreCalculator: (String) -> Double) : Double {
