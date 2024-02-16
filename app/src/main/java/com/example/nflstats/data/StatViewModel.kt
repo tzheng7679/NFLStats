@@ -56,13 +56,14 @@ class StatViewModel : ViewModel() {
                 }
                 val result = json.decodeFromString<EntityStats>(fetched)
 
-                //Duplicate checker -- adds a ([CATEGORY]) at the end if there's a another stat that shares the same name
-                val duplicateChecker = mutableMapOf<String, Stat>()
-
                 result.splits.categories.forEach {category ->
                     val cat = category.name
                     category.stats.forEach {stat ->
-                        val statAsObject = Stat(name = stat.displayName, value = stat.displayValue, description = stat.description, category = cat)
+                        val statAsObject = Stat(
+                            name = stat.displayName,
+                            value = stat.displayValue,
+                            description = stat.description,
+                            category = cat)
                         stats.add(statAsObject)
                     }
                 }
