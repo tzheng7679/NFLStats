@@ -1,23 +1,22 @@
 package com.example.nflstats.data
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nflstats.model.Entity
+import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
+import com.example.nflstats.model.json.APIPlayer
 import com.example.nflstats.model.json.EntityStats
+import com.example.nflstats.model.json.PlayerLinks
 import com.example.nflstats.network.ESPNApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import java.lang.Exception
 
 /**
  * ViewModel for the app; based mainly around doing every by itself after the Entity is set
@@ -49,6 +48,8 @@ class StatViewModel : ViewModel() {
                     type = currEntity.getType()
                 )
 
+                Log.d("HelpMe", fetched)
+
                 //parse JSON with kotlin deserializer, with unknown keys excluded because we don't need them
                 val json = Json {
                     ignoreUnknownKeys = true
@@ -68,8 +69,6 @@ class StatViewModel : ViewModel() {
                     }
                 }
 
-
-
                 setStatus(status = Status.SUCCESS)
             } catch (e: Exception) {
                 setStatus(status = Status.FAILURE)
@@ -86,5 +85,55 @@ class StatViewModel : ViewModel() {
 
     private fun setStatus(status : Status) {
         _uiState.update { it.copy(status = status) }
+    }
+
+    fun setPlayers(team: Entity = _uiState.value.currEntity ?: Team(Teams.DET)) {
+        setStatus(status = Status.LOADING)
+        val players = mutableListOf<Player>()
+
+        //request and add stats to [stats]
+        viewModelScope.launch {
+            try {
+                //Get JSON
+                val fetched: String = ESPNApi.servicer.fetchPlayers(
+                    season = Entity.getSeason(),
+                    teamID = team.id
+                )
+
+                //parse JSON with kotlin deserializer, with unknown keys excluded because we don't need them
+                val json = Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }
+                val resultLinks = json.decodeFromString<PlayerLinks>(fetched)
+
+                viewModelScope.launch {
+                    resultLinks.playerLinks.forEach{link ->
+                        try {
+                            val info = ESPNApi.servicer.fetchPlayerInfo(link.link)
+                            val resultPlayerInfo = json.decodeFromString<APIPlayer>(info)
+
+                            players.add(
+                                Player(
+                                    fName = resultPlayerInfo.firstName,
+                                    lName = resultPlayerInfo.lastName,
+                                    id = resultPlayerInfo.id.toInt(),
+                                    imageID = team.imageID
+                                )
+                            )
+                        } catch (e: Exception) {
+                            setStatus(status = Status.FAILURE)
+                            Log.d("HelpMe", e.stackTraceToString())
+                        }
+                    }
+                }
+
+                _uiState.update { it.copy(currPlayers = players) }
+                setStatus(status = Status.SUCCESS)
+            } catch (e: Exception) {
+                setStatus(status = Status.FAILURE)
+                Log.d("HelpMe", e.stackTraceToString())
+            }
+        }
     }
 }

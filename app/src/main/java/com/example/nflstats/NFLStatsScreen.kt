@@ -1,6 +1,8 @@
 package com.example.nflstats
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,6 +32,8 @@ enum class Menus(@StringRes val title : Int) {
     PlayerSelectionMenu(R.string.player_selection_menu),
     StatViewMenu(R.string.stat_view_menu)
 }
+
+@RequiresApi(Build.VERSION_CODES.R)
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun NFLStatsScreen(
@@ -41,10 +45,11 @@ fun NFLStatsScreen(
     val currentScreen = Menus.valueOf(backStackEntry?.destination?.route ?: Menus.MainMenu.name)
 
     NavHost(navController = navController, startDestination = Menus.MainMenu.name) {
+        //The main menu
         composable(route = Menus.MainMenu.name) {
             MainMenu(
                 { navController.navigate(Menus.TeamSelectionMenu.name) },
-                { navController.navigate(Menus.PlayerSelectionMenu.name )},
+                { navController.navigate(Menus.PlayerSelectionMenu.name) },
                 { }
             )
         }
@@ -69,15 +74,24 @@ fun NFLStatsScreen(
         //Route for going to the menu to select a player's stats
         composable(route = Menus.PlayerSelectionMenu.name) {
             SelectionMenu(
-                entities = listOf<Entity>(),
-                onCardClick = { },
+                entities = uiState.currPlayers,
+                onCardClick = {
+                    viewModel.setEntity(entity = it)
+                    navController.navigate(Menus.StatViewMenu.name)
+                },
                 imageModifier = defaultPlayerImageModifier
             )
         }
 
         //Route for going to see the statistics for a team (assumes that the stats have already been set)
         composable(route = Menus.StatViewMenu.name) {
-            StatViewMenu(uiState = uiState)
+            StatViewMenu(
+                uiState = uiState,
+                onGetPlayers = {
+                    viewModel.setPlayers()
+                    navController.navigate(Menus.PlayerSelectionMenu.name)
+                }
+            )
         }
     }
 }

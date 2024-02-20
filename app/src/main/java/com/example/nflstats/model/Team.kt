@@ -18,7 +18,7 @@ import it.skrape.selects.text
 /**
  * Represents a Team located in "city" (must be in lowercase short abbreviation)
  */
-class Team(val abbr : Teams, imageID : Int = teamImageMap[abbr] ?: 0) : Entity(imageID) {
+class Team(val abbr : Teams, override val imageID : Int = teamImageMap[abbr] ?: 0) : Entity() {
     //The team's id
     override val id: Int = abbrToID[abbr] ?: 1
 

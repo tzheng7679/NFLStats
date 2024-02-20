@@ -13,11 +13,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.Calendar
 
-abstract class Entity(val imageID : Int) {
+abstract class Entity() {
     //Have globalStats as the java equivalent of a static variable
     abstract var uniqueAdds : MutableSet<String>
     abstract var uniqueSubs : MutableSet<String>
     abstract val formattedName : Pair<String, String>
+    abstract val imageID : Int
     abstract val id : Int
     var secondaryInformation : String = "FILLER"
 
