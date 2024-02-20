@@ -30,8 +30,10 @@ import com.example.nflstats.data.Status
 enum class Menus(@StringRes val title : Int) {
     MainMenu(R.string.main_menu),
     TeamSelectionMenu(R.string.team_selection_menu),
-    PlayerSelectionMenu(R.string.player_selection_menu),
-    StatViewMenu(R.string.stat_view_menu)
+    FromMainPlayerSelectionMenu(R.string.from_main_player_selection_menu),
+    FromTeamPlayerSelectionMenu(R.string.from_team_player_selection_menu),
+    StatViewMenu(R.string.stat_view_menu),
+    StatViewMenuTrue(R.string.stat_view_menu_true)
 }
 
 @RequiresApi(Build.VERSION_CODES.R)
@@ -50,7 +52,7 @@ fun NFLStatsScreen(
         composable(route = Menus.MainMenu.name) {
             MainMenu(
                 { navController.navigate(Menus.TeamSelectionMenu.name) },
-                { navController.navigate(Menus.PlayerSelectionMenu.name) },
+                { navController.navigate(Menus.FromMainPlayerSelectionMenu.name) },
                 { }
             )
         }
@@ -73,16 +75,30 @@ fun NFLStatsScreen(
             )
         }
 
-        //Route for going to the menu to select a player's stats
-        composable(route = Menus.PlayerSelectionMenu.name) {
+        //Route for going to the menu to select a player's stats from a team
+        composable(route = Menus.FromTeamPlayerSelectionMenu.name) {
             SelectionMenu(
                 entities = uiState.currPlayers,
                 status = uiState.status,
                 onCardClick = {
-                    viewModel.setEntity(entity = it)
-                    navController.navigate(Menus.StatViewMenu.name)
+                    viewModel.setPlayer(player = it)
+                    navController.navigate(Menus.StatViewMenuTrue.name)
                 },
                 imageModifier = defaultPlayerImageModifier
+            )
+        }
+
+        //Route for going to the menu to select a player's stats from the main menu
+        composable(route = Menus.FromMainPlayerSelectionMenu.name) {
+            val options = Teams.entries.map { Team(it) }
+            SelectionMenu(
+                status = Status.SUCCESS,
+                entities = options,
+                onCardClick = { team ->
+                    viewModel.setPlayers(team)
+                    navController.navigate(Menus.FromTeamPlayerSelectionMenu.name)
+                },
+                imageModifier = defaultTeamImageModifier
             )
         }
 
@@ -92,8 +108,20 @@ fun NFLStatsScreen(
                 uiState = uiState,
                 onGetPlayers = {
                     viewModel.setPlayers()
-                    navController.navigate(Menus.PlayerSelectionMenu.name)
-                }
+                    navController.navigate(Menus.FromTeamPlayerSelectionMenu.name)
+                },
+                false
+            )
+        }
+
+        composable(route = Menus.StatViewMenuTrue.name) {
+            StatViewMenu(
+                uiState = uiState,
+                onGetPlayers = {
+                    viewModel.setPlayers()
+                    navController.navigate(Menus.FromTeamPlayerSelectionMenu.name)
+                },
+                true
             )
         }
     }

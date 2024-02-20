@@ -6,7 +6,9 @@ import com.example.nflstats.model.Stat
 
 data class UIState(
     var currEntity: Entity?,
-    var currStats : List<Stat>?,
-    var status : Status,
-    var currPlayers : List<Player> = emptyList()
+    var currStats: List<Stat>?,
+    var status: Status,
+    var currPlayers: List<Player> = emptyList(),
+    var currPlayer: Entity? = null,
+    var currPlayerStats: List<Stat>? = null
 )

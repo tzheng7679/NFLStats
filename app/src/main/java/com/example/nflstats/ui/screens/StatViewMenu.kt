@@ -65,9 +65,9 @@ import kotlin.math.min
  */
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) =
+fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, viewCurrPlayer: Boolean = false, modifier: Modifier = Modifier) =
     when(uiState.status) {
-        Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, modifier = modifier)
+        Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, viewCurrPlayer = viewCurrPlayer, modifier = modifier)
         Status.LOADING -> LoadingMenu()
         Status.FAILURE -> FailureMenu()
     }
@@ -76,10 +76,10 @@ fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, modifier: Modifier 
  * Function for displaying header and stats to screen
  */
 @Composable
-fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) {
+fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, viewCurrPlayer: Boolean = false, modifier: Modifier = Modifier) {
     when(orientation) {
-        Configuration.ORIENTATION_PORTRAIT -> PortraitSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers)
-        else -> LandscapeSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers)
+        Configuration.ORIENTATION_PORTRAIT -> PortraitSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers, viewCurrPlayer = viewCurrPlayer)
+        else -> LandscapeSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers, viewCurrPlayer = viewCurrPlayer)
     }
 }
 
@@ -88,9 +88,15 @@ fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, mo
  * Portrait version of viewing stats
  */
 @Composable
-private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) {
-    val entity = uiState.currEntity ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
-    val stats = uiState.currStats ?: emptyList<Stat>()
+private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, viewCurrPlayer: Boolean, modifier: Modifier = Modifier) {
+    val entity = when(viewCurrPlayer) {
+        false -> uiState.currEntity ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
+        true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
+    }
+    val stats = when(viewCurrPlayer) {
+        false -> uiState.currStats ?: emptyList<Stat>()
+        true -> uiState.currPlayerStats ?: emptyList<Stat>()
+    }
 
     Scaffold(
         topBar = @Composable { Header(entity = entity, secondaryInformation = entity.secondaryInformation, onGetPlayers = onGetPlayers) },
@@ -114,9 +120,15 @@ private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, modi
  * Landscape version of viewing stats
  */
 @Composable
-private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) {
-    val entity = uiState.currEntity ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
-    val stats = uiState.currStats ?: emptyList<Stat>()
+private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, viewCurrPlayer: Boolean, modifier: Modifier = Modifier) {
+    val entity = when(viewCurrPlayer) {
+        false -> uiState.currEntity ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
+        true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
+    }
+    val stats = when(viewCurrPlayer) {
+        false -> uiState.currStats ?: emptyList<Stat>()
+        true -> uiState.currPlayerStats ?: emptyList<Stat>()
+    }
 
     val it = 5.dp
     Row(verticalAlignment = Alignment.CenterVertically) {

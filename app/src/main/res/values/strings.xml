@@ -7,4 +7,7 @@
     <string name="change_statistics_shown">Change statistics shown</string>
     <string name="view_stats_for_a_player">View Stats for a Player</string>
     <string name="stat_view_menu">Stat View Menu</string>
+    <string name="from_main_player_selection_menu">From Main Player Selection Menu</string>
+    <string name="from_team_player_selection_menu">From Team Player Selection Menu</string>
+    <string name="stat_view_menu_true">Stat View Menu True</string>
 </resources>

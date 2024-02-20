@@ -23,7 +23,7 @@ import kotlinx.serialization.json.Json
  * ViewModel for the app; based mainly around doing every by itself after the Entity is set
  */
 class StatViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(UIState(null, null, Status.LOADING))
+    private val _uiState = MutableStateFlow(UIState(currEntity = null, currStats = null, status = Status.LOADING))
     val uiState: StateFlow<UIState> = _uiState.asStateFlow()
 
     /**
@@ -34,8 +34,17 @@ class StatViewModel : ViewModel() {
         fetchAndSetStatValues()
     }
 
-    private fun fetchAndSetStatValues() {
-        val currEntity = _uiState.value.currEntity ?: Team(Teams.WSH)
+    fun setPlayer(player: Entity) {
+        _uiState.update{ it.copy(currPlayer = player) }
+        fetchAndSetStatValues(true)
+    }
+
+    private fun fetchAndSetStatValues(forCurrPlayer: Boolean = false) {
+        val currEntity = when(forCurrPlayer) {
+            false -> _uiState.value.currEntity ?: Team(Teams.WSH)
+            true -> _uiState.value.currPlayer ?: Player("Error", "Man", 1, teamImageMap[Teams.WSH]!!)
+        }
+
         setStatus(status = Status.LOADING)
         val stats = mutableListOf<Stat>()
 
@@ -77,18 +86,21 @@ class StatViewModel : ViewModel() {
             }
         }
 
-        setStats(stats)
+        setStats(stats, forCurrPlayer)
     }
 
-    private fun setStats(values : List<Stat>) {
-        _uiState.update { it.copy(currStats = values) }
+    private fun setStats(values : List<Stat>, forCurrPlayer: Boolean) {
+        when(forCurrPlayer) {
+            false -> _uiState.update { it.copy(currStats = values) }
+            true -> _uiState.update { it.copy(currPlayerStats = values) }
+        }
     }
 
     private fun setStatus(status : Status) {
         _uiState.update { it.copy(status = status) }
     }
 
-    fun setPlayers(team: Entity = _uiState.value.currEntity ?: Team(Teams.ERROR)) {
+    fun setPlayers(team: Entity = _uiState.value.currEntity ?: Team(Teams.WSH)) {
         setStatus(status = Status.LOADING)
         val players = mutableListOf<Player>()
 
