@@ -27,17 +27,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
+import com.example.nflstats.ui.components.FailureMenu
+import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
 
 
 @Composable
-fun SelectionMenu(entities : List<Entity>, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardModifier : Modifier = defaultCardModifier, modifier: Modifier = Modifier) {
+fun SelectionMenu(status: Status, entities : List<Entity>, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardModifier : Modifier = defaultCardModifier, modifier: Modifier = Modifier) {
+    when(status) {
+        Status.SUCCESS -> SuccessSelectionMenu(entities = entities, onCardClick = onCardClick, imageModifier = imageModifier, cardModifier = cardModifier, modifier = modifier)
+        Status.LOADING -> LoadingMenu()
+        Status.FAILURE -> FailureMenu()
+    }
+}
+
+@Composable
+fun SuccessSelectionMenu(entities : List<Entity>, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardModifier : Modifier, modifier: Modifier = Modifier) {
     LazyColumn {
         val roundedCorner = 40.dp
         val cardMod = Modifier
@@ -58,7 +70,7 @@ fun SelectionMenu(entities : List<Entity>, onCardClick : (Entity) -> Unit, image
 @Composable
 @Preview
 fun SelectionPreview() {
-    SelectionMenu(Teams.entries.map { Team(it) }, {}, imageModifier = defaultTeamImageModifier, defaultCardModifier)
+    SelectionMenu(status = Status.SUCCESS, Teams.entries.map { Team(it) }, {}, imageModifier = defaultTeamImageModifier, defaultCardModifier)
 }
 @Composable
 fun EntityCard(entity : Entity, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardMod : Modifier) {

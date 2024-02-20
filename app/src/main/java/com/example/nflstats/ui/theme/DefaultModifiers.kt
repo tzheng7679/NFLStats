@@ -29,14 +29,12 @@ private val cardShape = RoundedCornerShape(40.dp)
 val defaultCardModifier = Modifier
     .border(3.dp, Color.Black, shape = cardShape)
     .clip(shape = cardShape)
-    .background(color = Color.White, shape = cardShape)
     .fillMaxWidth()
 
 private val expandedCardShape = RoundedCornerShape(40.dp, 40.dp, 25.dp, 25.dp)
 val expandedCardModifier = Modifier
     .border(3.dp, Color.Black, shape = expandedCardShape)
     .clip(shape = expandedCardShape)
-    .background(color = Color.White, shape = expandedCardShape)
     .fillMaxWidth()
 
 val defaultDescriptionModifier = Modifier

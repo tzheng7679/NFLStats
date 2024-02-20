@@ -11,7 +11,7 @@ import it.skrape.selects.html5.td
  * Represents an NFL player
  */
 
-class Player(val fName : String, val lName : String, override val id : Int, override val imageID : Int) : Entity() {
+data class Player(val fName : String, val lName : String, override val id : Int, override val imageID : Int) : Entity() {
     override var uniqueAdds : MutableSet<String> = mutableSetOf()
     override var uniqueSubs : MutableSet<String> = mutableSetOf()
 

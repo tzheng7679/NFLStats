@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 /**
@@ -87,11 +88,12 @@ class StatViewModel : ViewModel() {
         _uiState.update { it.copy(status = status) }
     }
 
-    fun setPlayers(team: Entity = _uiState.value.currEntity ?: Team(Teams.DET)) {
+    fun setPlayers(team: Entity = _uiState.value.currEntity ?: Team(Teams.ERROR)) {
         setStatus(status = Status.LOADING)
         val players = mutableListOf<Player>()
 
         //request and add stats to [stats]
+
         viewModelScope.launch {
             try {
                 //Get JSON
@@ -108,32 +110,40 @@ class StatViewModel : ViewModel() {
                 val resultLinks = json.decodeFromString<PlayerLinks>(fetched)
 
                 viewModelScope.launch {
-                    resultLinks.playerLinks.forEach{link ->
+                    resultLinks.playerLinks.forEach { link ->
                         try {
-                            val info = ESPNApi.servicer.fetchPlayerInfo(link.link)
+                            //format to use "https" instead of "http" because ESPN formats it as "http" for some reason
+                            val fLink = StringBuilder(link.link).insert(4, 's').toString()
+
+                            val info = ESPNApi.servicer.fetchPlayerInfo(fLink)
                             val resultPlayerInfo = json.decodeFromString<APIPlayer>(info)
 
-                            players.add(
-                                Player(
-                                    fName = resultPlayerInfo.firstName,
-                                    lName = resultPlayerInfo.lastName,
-                                    id = resultPlayerInfo.id.toInt(),
-                                    imageID = team.imageID
-                                )
+                            val p = Player(
+                                fName = resultPlayerInfo.firstName,
+                                lName = resultPlayerInfo.lastName,
+                                id = resultPlayerInfo.id.toInt(),
+                                imageID = team.imageID
                             )
+                            players.add(p)
                         } catch (e: Exception) {
                             setStatus(status = Status.FAILURE)
                             Log.d("HelpMe", e.stackTraceToString())
                         }
                     }
-                }
 
-                _uiState.update { it.copy(currPlayers = players) }
-                setStatus(status = Status.SUCCESS)
+                    _uiState.update { it.copy(currPlayers = players) }
+                }
             } catch (e: Exception) {
                 setStatus(status = Status.FAILURE)
                 Log.d("HelpMe", e.stackTraceToString())
             }
+
+            _uiState.update { it.copy(currPlayers = players) }
         }
+
+        Log.d("HelpMe", players.toString())
+        Log.d("HelpMe", _uiState.value.currPlayers.toString())
+
+        setStatus(status = Status.SUCCESS)
     }
 }

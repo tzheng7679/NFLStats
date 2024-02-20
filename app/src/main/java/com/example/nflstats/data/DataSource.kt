@@ -35,7 +35,8 @@ enum class Teams {
     SF,
     TB,
     TEN,
-    WSH
+    WSH,
+    ERROR
 }
 
 enum class Status {
@@ -78,6 +79,7 @@ val teamImageMap : Map<Teams, Int> = mapOf(
     Teams.TB to R.drawable.tb,
     Teams.TEN to R.drawable.ten,
     Teams.WSH to R.drawable.was,
+    Teams.ERROR to R.drawable.was
 )
 
 //maps teams to full names
@@ -114,6 +116,7 @@ val teamNameMap : Map<Teams, String> = mapOf(
     Teams.TB to "Tampa Bay Buccaneers",
     Teams.TEN to "Tennessee Titans",
     Teams.WSH to "Washington Commanders",
+    Teams.ERROR to "Error CouldNotFetch"
 )
 
 val abbrToID: Map<Teams, Int> = mapOf(
@@ -148,7 +151,8 @@ val abbrToID: Map<Teams, Int> = mapOf(
     Teams.SF to 25,
     Teams.TB to 27,
     Teams.TEN to 10,
-    Teams.WSH to 28
+    Teams.WSH to 28,
+    Teams.ERROR to 1
 )
 
 val sampleStats = listOf(

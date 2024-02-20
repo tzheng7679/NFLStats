@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +50,9 @@ import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
+import com.example.nflstats.ui.components.FailureMenu
+import com.example.nflstats.ui.components.GetPlayersButton
+import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultDescriptionModifier
@@ -61,7 +65,8 @@ import kotlin.math.min
  */
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) = when(uiState.status) {
+fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) =
+    when(uiState.status) {
         Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, modifier = modifier)
         Status.LOADING -> LoadingMenu()
         Status.FAILURE -> FailureMenu()
@@ -78,33 +83,6 @@ fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, mo
     }
 }
 
-/**
- * Loading menu for when loading stats
- */
-@Composable
-@Preview(showBackground = true)
-fun LoadingMenu() {
-    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "Loading...")
-
-        Spacer(Modifier.height(20.dp))
-
-        CircularProgressIndicator(
-            modifier = Modifier.width(64.dp),
-            color = MaterialTheme.colorScheme.secondary,
-            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-        )
-    }
-}
-
-/**
- * Menu for when it fails to retrieve stats
- */
-@Composable
-@Preview(showBackground = true)
-fun FailureMenu() {
-    Text(text = "Sorry, but stats could not retreived at this time")
-}
 
 /**
  * Portrait version of viewing stats
@@ -115,7 +93,7 @@ private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, modi
     val stats = uiState.currStats ?: emptyList<Stat>()
 
     Scaffold(
-        topBar = @Composable { Header(entity = entity, secondaryInformation = entity.secondaryInformation) },
+        topBar = @Composable { Header(entity = entity, secondaryInformation = entity.secondaryInformation, onGetPlayers = onGetPlayers) },
         modifier = modifier
     ) {
         LazyColumn(
@@ -142,7 +120,7 @@ private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, mod
 
     val it = 5.dp
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Lefter(entity = entity, secondaryInformation = "DSLKFJLSDJFLDSJF")
+        Lefter(entity = entity, secondaryInformation = "DSLKFJLSDJFLDSJF", onGetPlayers = onGetPlayers)
         LazyColumn(
             modifier = Modifier.padding(it),
             verticalArrangement = Arrangement.spacedBy((5).dp)
@@ -225,7 +203,7 @@ fun StatCard(stat: Stat) {
  * Header for the stat viewing menu
  */
 @Composable
-fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, modifier : Modifier = Modifier) {
+fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, onGetPlayers: () -> Unit, modifier : Modifier = Modifier) {
     val width = min(LocalConfiguration.current.screenWidthDp, LocalConfiguration.current.screenHeightDp)
 
     Row(
@@ -234,8 +212,13 @@ fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formatte
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        imageCircle(id = entity.imageID, isPlayer = entity is Player)
+        Column {
+            imageCircle(id = entity.imageID, isPlayer = entity is Player)
 
+            if(entity is Team) {
+                GetPlayersButton(onGetPlayers = onGetPlayers)
+            }
+        }
         Spacer(modifier = Modifier.width(15.dp))
 
         Column(
@@ -294,11 +277,12 @@ fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formatte
 }
 
 @Composable
-fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, modifier: Modifier = Modifier) {
+fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) {
     val width = min(LocalConfiguration.current.screenWidthDp, LocalConfiguration.current.screenHeightDp)
 
     Column(
-        modifier = modifier.width((width*3/4).dp)
+        modifier = modifier
+            .width((width * 3 / 4).dp)
             .padding(10.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -360,14 +344,18 @@ fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formatte
                 fontStyle = FontStyle.Italic, maxLines = 1
             )
         }
+
+        if(entity is Team) {
+            GetPlayersButton(onGetPlayers = onGetPlayers)
+        }
     }
 }
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-@Preview
+@Preview(showBackground = true)
 fun VerticalStatViewMenuPreview() {
     val x = Team(Teams.WSH)
-    SuccessMenu(uiState = UIState(currEntity = x, currStats = sampleStats, status = Status.SUCCESS), orientation = android.view.Surface.ROTATION_0, onGetPlayers = {})
+    StatViewMenu(uiState = UIState(currEntity = x, currStats = sampleStats, status = Status.SUCCESS), {})
 }
 
 @Composable
@@ -382,8 +370,8 @@ fun HorizontalStatViewMenuPreview() {
 @Preview(showBackground = true)
 fun HeaderPreview() {
     Column {
-        Header(Team(Teams.DAL), secondaryInformation = "FILLER")
-        Header(Player("Patrick", "Mahomes", 3139477, teamImageMap[Teams.KC]!!), secondaryInformation = "FILLER")
+        Header(Team(Teams.DAL), secondaryInformation = "FILLER", onGetPlayers = {})
+        Header(Player("Patrick", "Mahomes", 3139477, teamImageMap[Teams.KC]!!), secondaryInformation = "FILLER", onGetPlayers = {})
     }
 }
 
@@ -402,7 +390,7 @@ private fun calculateHeaderFontSize(name: String, maxFont: Double, maxScore: Dou
     } * screenWidth / 400
 }
 private fun calculateStatCardBaseFontSize(name : String, value : String, maxFont : Double, maxLengthScore : Double, multiplier : Double, screenWidth: Int) : Double {
-    val lengthScore = name.length + (multiplier * 1.1) * value.length
+    val lengthScore = name.length + (multiplier * 1.3) * value.length
     return when {
         lengthScore < maxLengthScore -> maxFont
         else -> maxFont * (maxLengthScore/lengthScore)

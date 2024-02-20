@@ -24,7 +24,7 @@ val client = OkHttpClient.Builder().apply {
     this.addInterceptor(intercepter)
         // time out setting
         .connectTimeout(3,TimeUnit.SECONDS)
-        .readTimeout(20,TimeUnit.SECONDS)
+        .readTimeout(3,TimeUnit.SECONDS)
         .writeTimeout(25,TimeUnit.SECONDS)
 
 }.build()
@@ -42,7 +42,7 @@ interface ESPNAPIService {
                                 @Path("id") id : Int)
     : String
 
-    @GET("{season}/teams/{teamID}/athletes?lang=en&region=us&limit=200/")
+    @GET("{season}/teams/{teamID}/athletes?lang=en&region=us&limit=200")
     suspend fun fetchPlayers(@Path("season") season : Int,
                              @Path("teamID") teamID : Int)
     : String

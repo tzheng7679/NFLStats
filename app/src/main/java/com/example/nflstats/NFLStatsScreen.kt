@@ -25,6 +25,7 @@ import com.example.nflstats.ui.screens.StatViewMenu
 import com.example.nflstats.ui.theme.defaultPlayerImageModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nflstats.data.Status
 
 enum class Menus(@StringRes val title : Int) {
     MainMenu(R.string.main_menu),
@@ -62,6 +63,7 @@ fun NFLStatsScreen(
             val context = LocalContext.current
             val options = Teams.entries.map { Team(it) }
             SelectionMenu(
+                status = Status.SUCCESS,
                 entities = options,
                 onCardClick = { entity ->
                     viewModel.setEntity(entity)
@@ -75,6 +77,7 @@ fun NFLStatsScreen(
         composable(route = Menus.PlayerSelectionMenu.name) {
             SelectionMenu(
                 entities = uiState.currPlayers,
+                status = uiState.status,
                 onCardClick = {
                     viewModel.setEntity(entity = it)
                     navController.navigate(Menus.StatViewMenu.name)
