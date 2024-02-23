@@ -38,24 +38,21 @@ import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
 
-
+/**
+ * Displays menu of options of type [E] (should only be either [Player] or [Team]).
+ */
 @Composable
-fun SelectionMenu(status: Status, entities : List<Entity>, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardModifier : Modifier = defaultCardModifier, modifier: Modifier = Modifier) {
+fun <E> SelectionMenu(status: Status, entities : List<E>, onCardClick : (E) -> Unit, imageModifier : Modifier, cardModifier : Modifier = defaultCardModifier, modifier: Modifier = Modifier) {
     when(status) {
-        Status.SUCCESS -> SuccessSelectionMenu(entities = entities, onCardClick = onCardClick, imageModifier = imageModifier, cardModifier = cardModifier, modifier = modifier)
+        Status.SUCCESS -> SuccessSelectionMenu<E>(entities = entities, onCardClick = onCardClick, imageModifier = imageModifier, cardModifier = cardModifier)
         Status.LOADING -> LoadingMenu()
         Status.FAILURE -> FailureMenu()
     }
 }
 
 @Composable
-fun SuccessSelectionMenu(entities : List<Entity>, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardModifier : Modifier, modifier: Modifier = Modifier) {
+fun <E> SuccessSelectionMenu(entities : List<E>, onCardClick : (E) -> Unit, imageModifier : Modifier, cardModifier : Modifier) {
     LazyColumn {
-        val roundedCorner = 40.dp
-        val cardMod = Modifier
-            .border(3.dp, Color.Black, RoundedCornerShape(roundedCorner))
-            .clip(RoundedCornerShape(roundedCorner))
-
         entities.forEach {
             item {
                 Row(modifier = Modifier.padding(3.dp)) {
@@ -73,8 +70,9 @@ fun SelectionPreview() {
     SelectionMenu(status = Status.SUCCESS, Teams.entries.map { Team(it) }, {}, imageModifier = defaultTeamImageModifier, defaultCardModifier)
 }
 @Composable
-fun EntityCard(entity : Entity, onCardClick : (Entity) -> Unit, imageModifier : Modifier, cardMod : Modifier) {
-    Card(
+fun <E> EntityCard(entity : E, onCardClick : (E) -> Unit, imageModifier : Modifier, cardMod : Modifier) {
+    //Check to make sure it is a [Team] or [Player] (and for type safety, as properties of entity are accessed)
+    if(entity is Entity) Card(
         modifier = cardMod.clickable{ onCardClick(entity) },
     ) {
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {

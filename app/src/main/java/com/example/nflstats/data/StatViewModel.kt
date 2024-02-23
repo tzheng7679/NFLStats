@@ -11,41 +11,48 @@ import com.example.nflstats.model.json.APIPlayer
 import com.example.nflstats.model.json.EntityStats
 import com.example.nflstats.model.json.PlayerLinks
 import com.example.nflstats.network.ESPNApi
+import com.example.nflstats.network.json
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 /**
  * ViewModel for the app; based mainly around doing every by itself after the Entity is set
  */
 class StatViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(UIState(currEntity = null, currStats = null, status = Status.LOADING))
+    private val _uiState = MutableStateFlow(UIState(currTeam = null, currTeamStats = null, teamStatus = Status.LOADING, playerStatus = Status.LOADING, playerListStatus = Status.LOADING))
     val uiState: StateFlow<UIState> = _uiState.asStateFlow()
 
     /**
      * Updates currEntity to entity, and sets the statistical values to those of the entity
      */
-    fun setEntity(entity : Entity) {
-        _uiState.update { it.copy(currEntity = entity) }
-        fetchAndSetStatValues()
+    fun setTeam(team: Team) {
+        _uiState.update { it.copy(currTeam = team) }
+        fetchAndSetStatValues(forCurrPlayer = false)
     }
 
-    fun setPlayer(player: Entity) {
+    fun setPlayer(player: Player) {
         _uiState.update{ it.copy(currPlayer = player) }
-        fetchAndSetStatValues(true)
+        fetchAndSetStatValues(forCurrPlayer = true)
     }
 
-    private fun fetchAndSetStatValues(forCurrPlayer: Boolean = false) {
-        val currEntity = when(forCurrPlayer) {
-            false -> _uiState.value.currEntity ?: Team(Teams.WSH)
-            true -> _uiState.value.currPlayer ?: Player("Error", "Man", 1, teamImageMap[Teams.WSH]!!)
+    private fun fetchAndSetStatValues(forCurrPlayer: Boolean) {
+        //set [setStatus] method and [currEntity] to appropriate values based on [forCurrPlayer]
+        val setStatus: (Status) -> Unit
+        val currEntity: Entity
+        if(forCurrPlayer){
+            setStatus = {it -> setTeamStatus(it) }
+            currEntity = _uiState.value.currPlayer ?: Player("Error", "Man", 1, teamImageMap[Teams.WSH]!!)
+        }
+        else {
+            setStatus = {it -> setPlayerStatus(it)}
+            currEntity = _uiState.value.currTeam ?: Team(Teams.WSH)
         }
 
-        setStatus(status = Status.LOADING)
+        setStatus(Status.LOADING)
         val stats = mutableListOf<Stat>()
 
         //request and add stats to [stats]
@@ -61,10 +68,6 @@ class StatViewModel : ViewModel() {
                 Log.d("HelpMe", fetched)
 
                 //parse JSON with kotlin deserializer, with unknown keys excluded because we don't need them
-                val json = Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                }
                 val result = json.decodeFromString<EntityStats>(fetched)
 
                 result.splits.categories.forEach {category ->
@@ -79,9 +82,9 @@ class StatViewModel : ViewModel() {
                     }
                 }
 
-                setStatus(status = Status.SUCCESS)
+                setStatus(Status.SUCCESS)
             } catch (e: Exception) {
-                setStatus(status = Status.FAILURE)
+                setStatus(Status.FAILURE)
                 Log.d("HelpMe", e.stackTraceToString())
             }
         }
@@ -91,20 +94,26 @@ class StatViewModel : ViewModel() {
 
     private fun setStats(values : List<Stat>, forCurrPlayer: Boolean) {
         when(forCurrPlayer) {
-            false -> _uiState.update { it.copy(currStats = values) }
+            false -> _uiState.update { it.copy(currTeamStats = values) }
             true -> _uiState.update { it.copy(currPlayerStats = values) }
         }
     }
 
-    private fun setStatus(status : Status) {
-        _uiState.update { it.copy(status = status) }
+    private fun setPlayerStatus(status : Status) {
+        _uiState.update { it.copy(playerStatus = status) }
     }
 
-    fun setPlayers(team: Entity = _uiState.value.currEntity ?: Team(Teams.WSH)) {
-        setStatus(status = Status.LOADING)
-        val players = mutableListOf<Player>()
+    private fun setTeamStatus(status : Status) {
+        _uiState.update { it.copy(teamStatus = status) }
+    }
 
-        //request and add stats to [stats]
+    private fun setPlayerListStatus(status : Status) {
+        _uiState.update { it.copy(playerListStatus= status) }
+    }
+
+    fun setPlayers(team: Team = _uiState.value.currTeam ?: Team(Teams.WSH)) {
+        val players = mutableListOf<Player>()
+        setPlayerListStatus(Status.LOADING)
 
         viewModelScope.launch {
             try {
@@ -114,16 +123,10 @@ class StatViewModel : ViewModel() {
                     teamID = team.id
                 )
 
-                //parse JSON with kotlin deserializer, with unknown keys excluded because we don't need them
-                val json = Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                }
                 val resultLinks = json.decodeFromString<PlayerLinks>(fetched)
-
                 viewModelScope.launch {
-                    resultLinks.playerLinks.forEach { link ->
-                        try {
+                    try {
+                        resultLinks.playerLinks.forEach { link ->
                             //format to use "https" instead of "http" because ESPN formats it as "http" for some reason
                             val fLink = StringBuilder(link.link).insert(4, 's').toString()
 
@@ -137,25 +140,24 @@ class StatViewModel : ViewModel() {
                                 imageID = team.imageID
                             )
                             players.add(p)
-                        } catch (e: Exception) {
-                            setStatus(status = Status.FAILURE)
-                            Log.d("HelpMe", e.stackTraceToString())
                         }
+                    } catch (e: Exception) {
+                        Log.d("HelpMe", e.stackTraceToString())
                     }
 
-                    _uiState.update { it.copy(currPlayers = players) }
+                    _uiState.update { it.copy(currPlayersOfTeam = players) }
                 }
+
+                setPlayerListStatus(Status.SUCCESS)
             } catch (e: Exception) {
-                setStatus(status = Status.FAILURE)
+                setPlayerListStatus(status = Status.FAILURE)
                 Log.d("HelpMe", e.stackTraceToString())
             }
 
-            _uiState.update { it.copy(currPlayers = players) }
+            _uiState.update { it.copy(currPlayersOfTeam = players) }
         }
 
         Log.d("HelpMe", players.toString())
-        Log.d("HelpMe", _uiState.value.currPlayers.toString())
-
-        setStatus(status = Status.SUCCESS)
+        Log.d("HelpMe", _uiState.value.currPlayersOfTeam.toString())
     }
 }

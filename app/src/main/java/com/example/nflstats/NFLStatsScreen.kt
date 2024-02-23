@@ -15,9 +15,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.nflstats.data.StatViewModel
 import com.example.nflstats.data.Teams
-import com.example.nflstats.data.teamImageMap
-import com.example.nflstats.model.Entity
-import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
 import com.example.nflstats.ui.screens.MainMenu
 import com.example.nflstats.ui.screens.SelectionMenu
@@ -26,6 +23,7 @@ import com.example.nflstats.ui.theme.defaultPlayerImageModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nflstats.data.Status
+import com.example.nflstats.model.Player
 
 enum class Menus(@StringRes val title : Int) {
     MainMenu(R.string.main_menu),
@@ -44,8 +42,6 @@ fun NFLStatsScreen(
     navController: NavHostController = rememberNavController()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = Menus.valueOf(backStackEntry?.destination?.route ?: Menus.MainMenu.name)
 
     NavHost(navController = navController, startDestination = Menus.MainMenu.name) {
         //The main menu
@@ -57,18 +53,18 @@ fun NFLStatsScreen(
             )
         }
 
-        //Route for going to the menu to select a team's stats
+        //Route for going to the menu to select a team, and then to StatViewMenu upon selection of team
         composable(route = Menus.TeamSelectionMenu.name) {
             //IMPORTANT *******************
             //NOTE: CHANGE OPTIONS LATER SO IT USES SYSTEM STORED OBJECTS, NOT NEWLY CREATED ONES
             //IMPORTANT *******************
-            val context = LocalContext.current
             val options = Teams.entries.map { Team(it) }
-            SelectionMenu(
+            SelectionMenu<Team>(
+                //can assume that teams will be succesfuly created
                 status = Status.SUCCESS,
                 entities = options,
-                onCardClick = { entity ->
-                    viewModel.setEntity(entity)
+                onCardClick = { team ->
+                    viewModel.setTeam(team)
                     navController.navigate(Menus.StatViewMenu.name)
                               },
                 imageModifier = defaultTeamImageModifier
@@ -77,9 +73,9 @@ fun NFLStatsScreen(
 
         //Route for going to the menu to select a player's stats from a team
         composable(route = Menus.FromTeamPlayerSelectionMenu.name) {
-            SelectionMenu(
-                entities = uiState.currPlayers,
-                status = uiState.status,
+            SelectionMenu<Player>(
+                status = uiState.playerStatus,
+                entities = uiState.currPlayersOfTeam,
                 onCardClick = {
                     viewModel.setPlayer(player = it)
                     navController.navigate(Menus.StatViewMenuTrue.name)
@@ -91,7 +87,8 @@ fun NFLStatsScreen(
         //Route for going to the menu to select a player's stats from the main menu
         composable(route = Menus.FromMainPlayerSelectionMenu.name) {
             val options = Teams.entries.map { Team(it) }
-            SelectionMenu(
+            SelectionMenu<Team>(
+                //can assume that teams will be succesfuly created
                 status = Status.SUCCESS,
                 entities = options,
                 onCardClick = { team ->
@@ -110,18 +107,7 @@ fun NFLStatsScreen(
                     viewModel.setPlayers()
                     navController.navigate(Menus.FromTeamPlayerSelectionMenu.name)
                 },
-                false
-            )
-        }
-
-        composable(route = Menus.StatViewMenuTrue.name) {
-            StatViewMenu(
-                uiState = uiState,
-                onGetPlayers = {
-                    viewModel.setPlayers()
-                    navController.navigate(Menus.FromTeamPlayerSelectionMenu.name)
-                },
-                true
+                viewPlayer = false
             )
         }
     }

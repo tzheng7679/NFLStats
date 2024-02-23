@@ -17,13 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,14 +29,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import ch.qos.logback.core.util.Loader.getResources
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.UIState
@@ -65,9 +59,9 @@ import kotlin.math.min
  */
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, viewCurrPlayer: Boolean = false, modifier: Modifier = Modifier) =
-    when(uiState.status) {
-        Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, viewCurrPlayer = viewCurrPlayer, modifier = modifier)
+fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) =
+    when(when(viewPlayer) {true -> uiState.playerStatus false -> uiState.teamStatus}) {
+        Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer, modifier = modifier)
         Status.LOADING -> LoadingMenu()
         Status.FAILURE -> FailureMenu()
     }
@@ -76,10 +70,10 @@ fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, viewCurrPlayer: Boo
  * Function for displaying header and stats to screen
  */
 @Composable
-fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, viewCurrPlayer: Boolean = false, modifier: Modifier = Modifier) {
+fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) {
     when(orientation) {
-        Configuration.ORIENTATION_PORTRAIT -> PortraitSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers, viewCurrPlayer = viewCurrPlayer)
-        else -> LandscapeSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers, viewCurrPlayer = viewCurrPlayer)
+        Configuration.ORIENTATION_PORTRAIT -> PortraitSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer, modifier = modifier)
+        else -> LandscapeSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer, modifier)
     }
 }
 
@@ -88,13 +82,14 @@ fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, vi
  * Portrait version of viewing stats
  */
 @Composable
-private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, viewCurrPlayer: Boolean, modifier: Modifier = Modifier) {
-    val entity = when(viewCurrPlayer) {
-        false -> uiState.currEntity ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
+private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) {
+    val entity = when(viewPlayer) {
+        false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
         true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
     }
-    val stats = when(viewCurrPlayer) {
-        false -> uiState.currStats ?: emptyList<Stat>()
+    
+    val stats = when(viewPlayer) {
+        false -> uiState.currTeamStats ?: emptyList<Stat>()
         true -> uiState.currPlayerStats ?: emptyList<Stat>()
     }
 
@@ -120,13 +115,13 @@ private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, view
  * Landscape version of viewing stats
  */
 @Composable
-private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, viewCurrPlayer: Boolean, modifier: Modifier = Modifier) {
-    val entity = when(viewCurrPlayer) {
-        false -> uiState.currEntity ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
+private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) {
+    val entity = when(viewPlayer) {
+        false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
         true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
     }
-    val stats = when(viewCurrPlayer) {
-        false -> uiState.currStats ?: emptyList<Stat>()
+    val stats = when(viewPlayer) {
+        false -> uiState.currTeamStats ?: emptyList<Stat>()
         true -> uiState.currPlayerStats ?: emptyList<Stat>()
     }
 
@@ -367,7 +362,7 @@ fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formatte
 @Preview(showBackground = true)
 fun VerticalStatViewMenuPreview() {
     val x = Team(Teams.WSH)
-    StatViewMenu(uiState = UIState(currEntity = x, currStats = sampleStats, status = Status.SUCCESS), {})
+    StatViewMenu(uiState = UIState(currTeam = x, currTeamStats = sampleStats, playerStatus = Status.SUCCESS, teamStatus = Status.SUCCESS, playerListStatus = Status.SUCCESS), onGetPlayers = {}, viewPlayer = false)
 }
 
 @Composable
@@ -375,7 +370,7 @@ fun VerticalStatViewMenuPreview() {
 @RequiresApi(Build.VERSION_CODES.R)
 fun HorizontalStatViewMenuPreview() {
     val x = Team(Teams.WSH)
-    StatViewMenu(uiState = UIState(currEntity = x, currStats = sampleStats, status = Status.SUCCESS), {})
+    StatViewMenu(uiState = UIState(currTeam = x, currTeamStats = sampleStats, playerStatus = Status.SUCCESS, teamStatus = Status.SUCCESS, playerListStatus = Status.SUCCESS), onGetPlayers = {}, viewPlayer = false)
 }
 
 @Composable

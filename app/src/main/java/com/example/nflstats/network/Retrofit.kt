@@ -14,6 +14,12 @@ import retrofit2.http.GET
 import retrofit2.http.Url
 import java.util.concurrent.TimeUnit
 
+//parse JSON with kotlin deserializer, with unknown keys excluded because we don't need them
+val json = Json {
+    ignoreUnknownKeys = true
+    isLenient = true
+}
+
 private const val BASE_URL = "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/"
 val contentType = "application/json".toMediaType()
 
