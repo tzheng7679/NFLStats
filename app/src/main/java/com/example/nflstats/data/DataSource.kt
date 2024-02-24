@@ -45,7 +45,7 @@ enum class Status {
 }
 
 //maps teams to image resources
-val teamImageMap : Map<Teams, Int> = mapOf(
+val teamImageMap: Map<Teams, Int> = mapOf(
     Teams.ARI to R.drawable.ari,
     Teams.ATL to R.drawable.atl,
     Teams.BAL to R.drawable.bal,
@@ -81,7 +81,7 @@ val teamImageMap : Map<Teams, Int> = mapOf(
 )
 
 //maps teams to full names
-val teamNameMap : Map<Teams, String> = mapOf(
+val teamNameMap: Map<Teams, String> = mapOf(
     Teams.ARI to "Arizona Cardinals",
     Teams.ATL to "Atlanta Falcons",
     Teams.BAL to "Baltimore Ravens",

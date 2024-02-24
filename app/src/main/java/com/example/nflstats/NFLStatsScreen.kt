@@ -7,23 +7,22 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.nflstats.data.StatViewModel
+import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
+import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
 import com.example.nflstats.ui.screens.MainMenu
 import com.example.nflstats.ui.screens.SelectionMenu
 import com.example.nflstats.ui.screens.StatViewMenu
 import com.example.nflstats.ui.theme.defaultPlayerImageModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.nflstats.data.Status
-import com.example.nflstats.model.Player
+
 
 enum class Menus(@StringRes val title : Int) {
     MainMenu(R.string.main_menu),
@@ -73,9 +72,10 @@ fun NFLStatsScreen(
 
         //Route for going to the menu to select a player's stats from a team
         composable(route = Menus.FromTeamPlayerSelectionMenu.name) {
+            viewModel.setPlayers()
             SelectionMenu<Player>(
-                status = uiState.playerStatus,
-                entities = uiState.currPlayersOfTeam,
+                status = uiState.currPlayerListStatus,
+                entities = uiState.currPlayerList ?: emptyList(),
                 onCardClick = {
                     viewModel.setPlayer(player = it)
                     navController.navigate(Menus.StatViewMenuTrue.name)
@@ -92,7 +92,7 @@ fun NFLStatsScreen(
                 status = Status.SUCCESS,
                 entities = options,
                 onCardClick = { team ->
-                    viewModel.setPlayers(team)
+                    viewModel.setTeam(team)
                     navController.navigate(Menus.FromTeamPlayerSelectionMenu.name)
                 },
                 imageModifier = defaultTeamImageModifier
@@ -104,10 +104,17 @@ fun NFLStatsScreen(
             StatViewMenu(
                 uiState = uiState,
                 onGetPlayers = {
-                    viewModel.setPlayers()
                     navController.navigate(Menus.FromTeamPlayerSelectionMenu.name)
                 },
                 viewPlayer = false
+            )
+        }
+
+        composable(route = Menus.StatViewMenuTrue.name) {
+            StatViewMenu(
+                uiState = uiState,
+                onGetPlayers = {},
+                viewPlayer = true
             )
         }
     }

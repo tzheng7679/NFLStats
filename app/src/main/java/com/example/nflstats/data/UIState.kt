@@ -3,21 +3,16 @@ package com.example.nflstats.data
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
-import com.example.nflstats.model.Team
 
-/**
- * [currTeam] is the current team selected, or player from the main menu selected
- * [currPlayer] is the current player selected from the Team menu
- */
 data class UIState(
-    var currTeam: Team?,
-    var currTeamStats: List<Stat>?,
-    var currPlayersOfTeam: List<Player> = emptyList(),
-    var playerListStatus: Status,
+    var currTeam: Entity? = null,
+    var currTeamStats: List<Stat>? = null,
+    var currTeamStatus: Status = Status.LOADING,
 
-    var currPlayer: Player? = null,
+    var currPlayerList: List<Player>? = emptyList(),
+    var currPlayerListStatus: Status = Status.LOADING,
+
+    var currPlayer: Entity? = null,
     var currPlayerStats: List<Stat>? = null,
-
-    var teamStatus: Status,
-    var playerStatus: Status
+    var currPlayerStatus: Status = Status.LOADING
 )
