@@ -31,7 +31,7 @@ fun LoadingMenu() {
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(40.dp))
 
         Text(text = "This may take up to 30 seconds...")
     }
