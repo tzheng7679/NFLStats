@@ -117,7 +117,7 @@ fun NFLStatsScreen(
             StatViewMenu(
                 uiState = uiState,
                 onGetPlayers = {},
-                viewPlayer = true
+                viewPlayer = true,
             )
         }
 

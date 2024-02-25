@@ -18,12 +18,10 @@ import androidx.compose.ui.unit.dp
 val defaultTeamImageModifier = Modifier
     .size(100.dp)
     .clip(CircleShape)
-    .border(BorderStroke(4.dp, Color.Gray), CircleShape)
 
 val defaultPlayerImageModifier = Modifier
     .size(100.dp)
     .clip(CircleShape)
-    .border(BorderStroke(4.dp, Color.DarkGray), CircleShape)
 
 private val cardShape = RoundedCornerShape(40.dp)
 val defaultCardModifier = Modifier

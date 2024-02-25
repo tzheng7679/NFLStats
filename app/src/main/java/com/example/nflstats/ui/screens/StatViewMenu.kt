@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +42,8 @@ import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.UIState
+import com.example.nflstats.data.abbrToID
+import com.example.nflstats.data.idToAbbr
 import com.example.nflstats.data.sampleStats
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
@@ -49,9 +54,12 @@ import com.example.nflstats.ui.components.FailureMenu
 import com.example.nflstats.ui.components.GetPlayersButton
 import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.imageCircle
+import com.example.nflstats.ui.theme.ColorTypes
+import com.example.nflstats.ui.theme.StatViewTheme
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultDescriptionModifier
 import com.example.nflstats.ui.theme.expandedCardModifier
+import com.example.nflstats.ui.theme.teamColorMap
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.math.min
 
@@ -62,10 +70,14 @@ import kotlin.math.min
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) =
-    when(when(viewPlayer) {true -> uiState.currPlayerStatus false -> uiState.currTeamStatus}) {
-        Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer, modifier = modifier)
-        Status.LOADING -> LoadingMenu()
-        else -> FailureMenu()
+    StatViewTheme(teamColorMap[idToAbbr[uiState.currTeam!!.id]]!!) {
+        when(
+            when(viewPlayer) {true -> uiState.currPlayerStatus false -> uiState.currTeamStatus}
+        ) {
+            Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer, modifier = modifier)
+            Status.LOADING -> LoadingMenu()
+            else -> FailureMenu()
+        }
     }
 
 /**
@@ -95,8 +107,7 @@ private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, view
     }
 
     Scaffold(
-        topBar = @Composable { Header(entity = entity, secondaryInformation = entity.secondaryInformation, onGetPlayers = onGetPlayers) },
-        modifier = modifier
+        topBar = @Composable { Header(entity = entity, secondaryInformation = entity.secondaryInformation, onGetPlayers = onGetPlayers) }
     ) {
         LazyColumn(
             modifier = Modifier.padding(it),
@@ -127,7 +138,7 @@ private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, vie
     }
 
     val it = 5.dp
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier) {
         Lefter(entity = entity, secondaryInformation = "DSLKFJLSDJFLDSJF", onGetPlayers = onGetPlayers)
         LazyColumn(
             modifier = Modifier.padding(it),
@@ -149,11 +160,6 @@ private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, vie
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatCard(stat: Stat) {
-    val width = min(LocalConfiguration.current.screenWidthDp, LocalConfiguration.current.screenHeightDp)
-    val name = stat.name
-    val value = stat.value
-    val description = stat.description
-
     var expanded by remember { mutableStateOf(false) }
 
     Card(
@@ -170,26 +176,30 @@ fun StatCard(stat: Stat) {
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
+            //stat name
             Text(
-                text = name,
+                text = stat.name,
                 fontSize = 6.em,
                 fontWeight = FontWeight.Bold
             )
             Row {
+                //stat category
                 Text(
                     text = stat.category,
-                    fontSize = 4.em
+                    fontSize = 4.em,
                 )
                 Column(
                     modifier = Modifier.wrapContentSize(Alignment.Center).fillMaxWidth(),
                     horizontalAlignment = Alignment.End
                 ) {
+                    //Stat value
                     Text(
-                        text = value,
+                        text = stat.value,
                         textAlign = TextAlign.Right,
                         fontSize = 12.em,
                         fontWeight = FontWeight.ExtraBold,
-                        maxLines = 1
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -199,7 +209,7 @@ fun StatCard(stat: Stat) {
         if (expanded) {
             Card(modifier = defaultDescriptionModifier.wrapContentSize(Alignment.Center)) {
                 Text(
-                    text = description,
+                    text = stat.description,
                     textAlign = TextAlign.Center,
                     fontSize = 4.em
                 )
@@ -266,6 +276,7 @@ fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formatte
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = formattedName.second,
+                    color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Left,
                     fontSize = secondFontSize.em, //size of font for team names
                     fontWeight = FontWeight.Bold,
@@ -327,7 +338,7 @@ fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formatte
                 //THANKS DAN SNYDER, for making me write something to change the font size
                 val secondFontSize : Double = calculateHeaderFontSize(
                     name = formattedName.second,
-                    maxFont = 13.0,
+                    maxFont = 19.0,
                     maxScore = 49.0,
                     screenWidth = width
                 ) { it.length.toDouble() * it.length.toDouble() }
@@ -339,7 +350,8 @@ fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formatte
                     textAlign = TextAlign.Center,
                     fontSize = secondFontSize.em, //size of font for team names
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 

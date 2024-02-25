@@ -151,6 +151,8 @@ val abbrToID: Map<Teams, Int> = mapOf(
     Teams.WSH to 28
 )
 
+val idToAbbr = abbrToID.map{ (k,v) -> v to k}.toMap()
+
 val sampleStats = listOf(
     Stat("Completion Percentage", "67.3", "The percent of passes completed", "Passing"),
     Stat("Passing Yards" , "4183", "The amount of yards passing", "Passing"),
