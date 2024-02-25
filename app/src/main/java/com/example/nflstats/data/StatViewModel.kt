@@ -11,13 +11,13 @@ import com.example.nflstats.model.json.APIPlayer
 import com.example.nflstats.model.json.EntityStats
 import com.example.nflstats.model.json.PlayerLinks
 import com.example.nflstats.network.ESPNApi
+import com.example.nflstats.network.json
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 /**
@@ -102,50 +102,48 @@ class StatViewModel : ViewModel() {
         }
     }
     fun setPlayers(team: Entity = _uiState.value.currTeam ?: Team(Teams.WSH)) {
+        Log.d("RunningMan", "Why they be running me, man?")
+
         setPlayerListStatus(status = Status.LOADING)
         val players = mutableListOf<Player>()
 
-        //request and add stats to [stats]
-
         viewModelScope.launch {
-            try {
-                async {
+            async {
+                try {
                     //Get JSON
-                    val fetched: String = ESPNApi.servicer.fetchPlayers(
+                    val fetched = ESPNApi.servicer.fetchPlayers(
                         season = Entity.getSeason(),
                         teamID = team.id
                     )
 
                     //parse JSON with kotlin deserializer, with unknown keys excluded because we don't need them
-                    val json = Json {
-                        ignoreUnknownKeys = true
-                        isLenient = true
-                    }
-                    val resultLinks = json.decodeFromString<PlayerLinks>(fetched)
+                    val resultLinks: PlayerLinks = json.decodeFromString<PlayerLinks>(fetched)
 
+                    //for each link, go get the player's info and add it to [players]
                     resultLinks.playerLinks.forEach { link ->
-                        //format to use "https" instead of "http" because ESPN formats it as "http" for some reason
+                        //format to use "https" instead of "http" because ESPN formats it as "http" for some reason, and otherwise it'll cause a security exception
                         val fLink = StringBuilder(link.link).insert(4, 's').toString()
 
                         val info = ESPNApi.servicer.fetchPlayerInfo(fLink)
+                        //Process JSON into an [APIPlayer]
                         val resultPlayerInfo = json.decodeFromString<APIPlayer>(info)
 
-                        val p = Player(
+                        players.add(
+                            Player(
                             fName = resultPlayerInfo.firstName,
                             lName = resultPlayerInfo.lastName,
                             id = resultPlayerInfo.id.toInt(),
                             imageID = team.imageID
+                            )
                         )
-                        players.add(p)
                     }
-                }.await()
-
-                _uiState.update { it.copy(currPlayerList = players) }
-                setPlayerListStatus(Status.SUCCESS)
-            } catch (e: Exception) {
-                setPlayerListStatus(status = Status.FAILURE)
-                Log.d("HelpMe", e.stackTraceToString())
-            }
+                    _uiState.update { it.copy(currPlayerList = players) }
+                    setPlayerListStatus(Status.SUCCESS)
+                } catch (e: Exception) {
+                    setPlayerListStatus(status = Status.FAILURE)
+                    Log.d("HelpMe", e.stackTraceToString())
+                }
+            }.await()
         }
     }
 
