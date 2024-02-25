@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +52,7 @@ import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultDescriptionModifier
 import com.example.nflstats.ui.theme.expandedCardModifier
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.math.min
 
 
@@ -154,7 +156,6 @@ fun StatCard(stat: Stat) {
 
     var expanded by remember { mutableStateOf(false) }
 
-    val baseFont = calculateStatCardBaseFontSize(name = name, value = value, maxFont = 7.0, maxLengthScore = 30.0, multiplier = 2.7, screenWidth = width)
     Card(
         modifier = when(expanded) { true -> expandedCardModifier else -> defaultCardModifier }
             .animateContentSize(
@@ -165,40 +166,42 @@ fun StatCard(stat: Stat) {
             ),
         onClick = { expanded = !expanded }
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp)
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
-            Column {
-                Text(
-                    text = name,
-                    fontSize = baseFont.em,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
-                )
-
+            Text(
+                text = name,
+                fontSize = 6.em,
+                fontWeight = FontWeight.Bold
+            )
+            Row {
                 Text(
                     text = stat.category,
-                    fontSize = (baseFont * 0.6).em
+                    fontSize = 4.em
                 )
+                Column(
+                    modifier = Modifier.wrapContentSize(Alignment.Center).fillMaxWidth(),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = value,
+                        textAlign = TextAlign.Right,
+                        fontSize = 12.em,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1
+                    )
+                }
             }
-
-            Text(
-                text = value,
-                fontSize = (baseFont * 2.6).em,
-                fontWeight = FontWeight.ExtraBold,
-                maxLines = 1
-            )
         }
 
         //Description for if card is expanded
         if (expanded) {
-            Card(modifier = defaultDescriptionModifier) {
+            Card(modifier = defaultDescriptionModifier.wrapContentSize(Alignment.Center)) {
                 Text(
                     text = description,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontSize = 4.em
                 )
             }
         }
@@ -307,9 +310,9 @@ fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formatte
                 val firstFontSize = calculateHeaderFontSize(
                     formattedName.first,
                     maxFont = 9.0,
-                    maxScore = 16.0,
+                    maxScore = 256.0,
                     screenWidth = width
-                ) { it.length.toDouble() }
+                ) { it.length.toDouble() * it.length.toDouble() }
 
                 //First name OR Team city
                 Text(
@@ -325,9 +328,9 @@ fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formatte
                 val secondFontSize : Double = calculateHeaderFontSize(
                     name = formattedName.second,
                     maxFont = 13.0,
-                    maxScore = 7.0,
+                    maxScore = 49.0,
                     screenWidth = width
-                ) { it.length.toDouble() }
+                ) { it.length.toDouble() * it.length.toDouble() }
 
                 //Team nickname
                 Text(
