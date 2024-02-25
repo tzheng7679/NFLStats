@@ -2,6 +2,7 @@
 
 package com.example.nflstats.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -12,9 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -78,7 +81,11 @@ fun <E> EntityCard(entity : E, onCardClick : (E) -> Unit, imageModifier : Modifi
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             Spacer(Modifier.width(20.dp))
 
-            imageCircle(id = entity.imageID, isPlayer = entity is Player)
+            imageCircle(id = entity.imageID, imageModifier = defaultTeamImageModifier
+                .border(
+                    BorderStroke(4.dp, Color(128,128,128)), CircleShape
+                )
+            )
 
             val formattedName: Pair<String, String> = entity.formattedName
             Column {
