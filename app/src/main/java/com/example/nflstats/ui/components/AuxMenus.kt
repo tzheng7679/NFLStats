@@ -30,6 +30,8 @@ fun LoadingMenu() {
             color = MaterialTheme.colorScheme.secondary,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
+
+        Text(text = "This may take up to 30 seconds...")
     }
 }
 
