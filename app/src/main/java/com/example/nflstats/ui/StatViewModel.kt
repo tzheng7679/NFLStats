@@ -1,8 +1,11 @@
-package com.example.nflstats.data
+package com.example.nflstats.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.nflstats.data.Status
+import com.example.nflstats.data.Teams
+import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat

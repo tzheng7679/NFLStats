@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -96,9 +97,6 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-rxjava2")
     implementation("androidx.compose.material3:material3:1.2.0")
 
-    //Web-scraping toolkit
-    implementation("it.skrape:skrapeit:1.2.2")
-
     //API requester
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -132,6 +130,10 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
-    //csv reader
-    implementation("com.opencsv:opencsv:3.7")
+    val room_version = "2.6.1"
+    //Room
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.9.21-1.0.15")
 }

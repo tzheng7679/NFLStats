@@ -8,7 +8,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,8 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
-import com.example.nflstats.data.UIState
-import com.example.nflstats.data.abbrToID
+import com.example.nflstats.ui.UIState
 import com.example.nflstats.data.idToAbbr
 import com.example.nflstats.data.sampleStats
 import com.example.nflstats.data.teamImageMap
@@ -54,13 +51,11 @@ import com.example.nflstats.ui.components.FailureMenu
 import com.example.nflstats.ui.components.GetPlayersButton
 import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.imageCircle
-import com.example.nflstats.ui.theme.ColorTypes
 import com.example.nflstats.ui.theme.StatViewTheme
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultDescriptionModifier
 import com.example.nflstats.ui.theme.expandedCardModifier
 import com.example.nflstats.ui.theme.teamColorMap
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.math.min
 
 

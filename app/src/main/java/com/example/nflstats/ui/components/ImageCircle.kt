@@ -7,11 +7,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.nflstats.ui.theme.defaultTeamImageModifier
 import com.example.nflstats.ui.theme.defaultPlayerImageModifier
+import com.example.nflstats.ui.theme.defaultTeamImageModifier
 
 @Composable
 fun imageCircle(id : Int, isPlayer : Boolean = false) {

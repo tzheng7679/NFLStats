@@ -12,7 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.nflstats.data.StatViewModel
+import com.example.nflstats.ui.StatViewModel
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.model.Player

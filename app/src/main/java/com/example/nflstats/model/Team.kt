@@ -1,33 +1,24 @@
 package com.example.nflstats.model
-import com.example.nflstats.R
+import androidx.room.PrimaryKey
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.abbrToID
+import com.example.nflstats.data.database.Converters
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.data.teamNameMap
-import it.skrape.core.htmlDocument
-import it.skrape.fetcher.HttpFetcher
-import it.skrape.fetcher.response
-import it.skrape.fetcher.skrape
-import it.skrape.selects.html5.a
-import it.skrape.selects.html5.div
-import it.skrape.selects.html5.p
-import it.skrape.selects.html5.tbody
-import it.skrape.selects.html5.td
-import it.skrape.selects.text
 
 /**
  * Represents a Team located in "city" (must be in lowercase short abbreviation)
  */
-data class Team(val abbr : Teams, override val imageID : Int = teamImageMap[abbr] ?: 0) : Entity() {
+@androidx.room.Entity(tableName = "teams")
+data class Team(
+    val abbr: Teams,
+    override val imageID: Int = teamImageMap[abbr] ?: 0,
+    override var uniqueAdds: MutableSet<String> = mutableSetOf<String>(),
+    override var uniqueSubs: MutableSet<String> = mutableSetOf<String>()
+) : Entity() {
     //The team's id
+    @PrimaryKey
     override val id: Int = abbrToID[abbr] ?: 1
-
-    //set of stats that will be displayed for all teams
-    companion object {
-        var globalTeamStats = mutableSetOf<String>()
-    }
-    override var uniqueAdds : MutableSet<String> = mutableSetOf()
-    override var uniqueSubs : MutableSet<String> = mutableSetOf()
 
     override val formattedName: Pair<String, String>
             get() {
@@ -58,8 +49,5 @@ data class Team(val abbr : Teams, override val imageID : Int = teamImageMap[abbr
         throw NotImplementedError()
     }
 
-    override fun getStatNames(): Set<String> { return globalTeamStats union uniqueAdds subtract uniqueSubs }
-
-    fun addGlobalStat(name : String) { globalTeamStats.add(name) }
-    fun removeGlobalStat(name : String) { globalTeamStats.remove(name) }
+    override fun getStatNames(globalStats: Set<String>): Set<String> { return globalStats union uniqueAdds subtract uniqueSubs }
 }

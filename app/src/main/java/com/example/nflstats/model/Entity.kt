@@ -1,25 +1,17 @@
 package com.example.nflstats.model
 
-import android.content.Context
-import android.util.Log
-import androidx.annotation.VisibleForTesting
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import org.json.JSONObject
-import retrofit2.Retrofit
-import retrofit2.converter.scalars.ScalarsConverterFactory
+import androidx.room.Entity
 import java.util.Calendar
 
+@Entity
 abstract class Entity() {
     //Have globalStats as the java equivalent of a static variable
+    abstract val id : Int
+
     abstract var uniqueAdds : MutableSet<String>
     abstract var uniqueSubs : MutableSet<String>
     abstract val formattedName : Pair<String, String>
     abstract val imageID : Int
-    abstract val id : Int
     var secondaryInformation : String = "FILLER"
 
     //set of maps and base string for PFR URL
@@ -59,7 +51,7 @@ abstract class Entity() {
     /**
      * Returns Set of string name for stats for this object
      */
-    abstract fun getStatNames() : Set<String>
+    abstract fun getStatNames(globalStats: Set<String>) : Set<String>
 
     abstract fun getURLAddition() : String
     /**

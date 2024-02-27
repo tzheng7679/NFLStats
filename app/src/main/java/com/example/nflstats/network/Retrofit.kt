@@ -1,16 +1,12 @@
 package com.example.nflstats.network
-import com.example.nflstats.model.json.EntityStats
-import retrofit2.http.Path
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Url
 import java.util.concurrent.TimeUnit
 
