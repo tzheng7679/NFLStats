@@ -7,6 +7,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -15,8 +16,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.nflstats.ui.StatViewModel
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
+import com.example.nflstats.data.database.AppDataContainer
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
+import com.example.nflstats.ui.StatSettingsViewModel
 import com.example.nflstats.ui.screens.MainMenu
 import com.example.nflstats.ui.screens.SelectionMenu
 import com.example.nflstats.ui.screens.StatSettingsMenu
@@ -32,6 +35,7 @@ enum class Menus(@StringRes val title : Int) {
     FromTeamPlayerSelectionMenu(R.string.from_team_player_selection_menu),
     StatViewMenuForTeam(R.string.stat_view_menu),
     StatViewMenuForPlayer(R.string.stat_view_menu_true),
+    StatSettingsEntry(R.string.stat_settings_menu_entry),
     StatSettingsMenu(R.string.stat_settings_menu)
 }
 
@@ -42,8 +46,10 @@ fun NFLStatsScreen(
     viewModel: StatViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val appDataContainer: AppDataContainer = AppDataContainer(LocalContext.current)
+    val statSettingsViewModel: StatSettingsViewModel = StatSettingsViewModel(appDataContainer.teamsRepo, appDataContainer.playersRepo)
 
+    val uiState by viewModel.uiState.collectAsState()
     NavHost(navController = navController, startDestination = Menus.MainMenu.name) {
         //The main menu
         composable(route = Menus.MainMenu.name) {
@@ -121,13 +127,17 @@ fun NFLStatsScreen(
             )
         }
 
-        composable(route = Menus.StatSettingsMenu.name) {
+        composable(route = Menus.StatSettingsEntry.name) {
             StatSettingsMenu(
                 toGlobalTeams = {},
                 toTeams = {},
                 toGlobalPlayers = {},
                 toPlayers = {},
             )
+        }
+
+        composable(route = Menus.StatSettingsMenu.name) {
+
         }
     }
 }

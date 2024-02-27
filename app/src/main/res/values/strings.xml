@@ -10,5 +10,6 @@
     <string name="from_main_player_selection_menu">From Main Player Selection Menu</string>
     <string name="from_team_player_selection_menu">From Team Player Selection Menu</string>
     <string name="stat_view_menu_true">Stat View Menu True</string>
+    <string name="stat_settings_menu_entry">Stat Settings Entry</string>
     <string name="stat_settings_menu">Stat Settings Menu</string>
 </resources>
