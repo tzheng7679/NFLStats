@@ -26,6 +26,7 @@ import com.example.nflstats.ui.StatViewModel
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.database.AppDataContainer
+import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
 import com.example.nflstats.ui.StatSettingsViewModel
@@ -167,7 +168,7 @@ fun NFLStatsScreen(
             route = Menus.StatSettingsSelectionMenu.name + "/{forPlayer}",
             arguments = listOf(navArgument("forPlayer") { type = NavType.BoolType })
         ) {
-            SelectionMenu(
+            SelectionMenu<Entity>(
                 entities = when (it.arguments?.getBoolean("forPlayer") ?: false) {
                         true -> statSettingsUIState.value.playerSettingsList ?: emptyList()
                         false -> statSettingsUIState.value.teamSettingsList ?: emptyList()

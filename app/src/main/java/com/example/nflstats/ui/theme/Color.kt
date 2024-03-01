@@ -31,14 +31,14 @@ val teamColorMap: Map<Teams, Map<ColorTypes, Color>> = mapOf(
     ),
 
     Teams.BAL to mapOf(
-        ColorTypes.PRIMARY to Color(26,25,95),
-        ColorTypes.SECONDARY to Color(0,0,0),
-        ColorTypes.TERTIARY to Color(187,147,52),
+        ColorTypes.PRIMARY to Color(187,147,52),
+        ColorTypes.SECONDARY to Color(26,25,95),
+        ColorTypes.TERTIARY to Color(0,0,0),
     ),
 
     Teams.BUF to mapOf(
-        ColorTypes.PRIMARY to Color(12,46,130),
-        ColorTypes.SECONDARY to Color(213,10,10),
+        ColorTypes.PRIMARY to Color(213,10,10),
+        ColorTypes.SECONDARY to Color(12,46,130),
         ColorTypes.TERTIARY to Color(0,39,77),
     ),
 
@@ -49,8 +49,8 @@ val teamColorMap: Map<Teams, Map<ColorTypes, Color>> = mapOf(
     ),
 
     Teams.CHI to mapOf(
-        ColorTypes.PRIMARY to Color(11,22,42),
-        ColorTypes.SECONDARY to Color(200,56,3),
+        ColorTypes.PRIMARY to Color(200,56,3),
+        ColorTypes.SECONDARY to Color(11,22,42),
         ColorTypes.TERTIARY to Color(255,255,255),
     ),
 
@@ -61,14 +61,14 @@ val teamColorMap: Map<Teams, Map<ColorTypes, Color>> = mapOf(
     ),
 
     Teams.CLE to mapOf(
-        ColorTypes.PRIMARY to Color(49,29,0),
-        ColorTypes.SECONDARY to Color(255,60,0),
+        ColorTypes.PRIMARY to Color(255,60,0),
+        ColorTypes.SECONDARY to Color(49,29,0),
         ColorTypes.TERTIARY to Color(255,255,255),
     ),
 
     Teams.DAL to mapOf(
-        ColorTypes.PRIMARY to Color(0,34,68),
-        ColorTypes.SECONDARY to Color(134,147,151),
+        ColorTypes.PRIMARY to Color(134,147,151),
+        ColorTypes.SECONDARY to Color(0,34,68),
         ColorTypes.TERTIARY to Color(0,51,141)
     ),
 
@@ -85,8 +85,8 @@ val teamColorMap: Map<Teams, Map<ColorTypes, Color>> = mapOf(
     ),
 
     Teams.GB to mapOf(
-        ColorTypes.PRIMARY to Color(28,45,37),
-        ColorTypes.SECONDARY to Color(238,173,30),
+        ColorTypes.PRIMARY to Color(238,173,30),
+        ColorTypes.SECONDARY to Color(28,45,37),
         ColorTypes.TERTIARY to Color(255,255,255),
     ),
 
@@ -97,8 +97,8 @@ val teamColorMap: Map<Teams, Map<ColorTypes, Color>> = mapOf(
     ),
 
     Teams.IND to mapOf(
-        ColorTypes.PRIMARY to Color(1,51,105),
-        ColorTypes.SECONDARY to Color(155,161,162),
+        ColorTypes.PRIMARY to Color(155,161,162),
+        ColorTypes.SECONDARY to Color(1,51,105),
         ColorTypes.TERTIARY to Color(255,255,255),
     ),
 
@@ -145,14 +145,14 @@ val teamColorMap: Map<Teams, Map<ColorTypes, Color>> = mapOf(
     ),
 
     Teams.NE to mapOf(
-        ColorTypes.PRIMARY to Color(0,21,50),
-        ColorTypes.SECONDARY to Color(213,10,10),
+        ColorTypes.PRIMARY to Color(213,10,10),
+        ColorTypes.SECONDARY to Color(0,21,50),
         ColorTypes.TERTIARY to Color(176,183,188),
     ),
 
     Teams.NO to mapOf(
-        ColorTypes.PRIMARY to Color(0,0,0),
-        ColorTypes.SECONDARY to Color(159,137,88),
+        ColorTypes.PRIMARY to Color(159,137,88),
+        ColorTypes.SECONDARY to Color(0,0,0),
         ColorTypes.TERTIARY to Color(255,255,255),
     ),
 
@@ -175,14 +175,14 @@ val teamColorMap: Map<Teams, Map<ColorTypes, Color>> = mapOf(
     ),
 
     Teams.PIT to mapOf(
-        ColorTypes.PRIMARY to Color(0,0,0),
-        ColorTypes.SECONDARY to Color(238,173,30),
+        ColorTypes.PRIMARY to Color(238,173,30),
+        ColorTypes.SECONDARY to Color(0,0,0),
         ColorTypes.TERTIARY to Color(155,161,162),
     ),
 
     Teams.SEA to mapOf(
-        ColorTypes.PRIMARY to Color(0,21,50),
-        ColorTypes.SECONDARY to Color(105,190,40),
+        ColorTypes.PRIMARY to Color(105,190,40),
+        ColorTypes.SECONDARY to Color(0,21,50),
         ColorTypes.TERTIARY to Color(155,161,162),
     ),
 
@@ -199,8 +199,8 @@ val teamColorMap: Map<Teams, Map<ColorTypes, Color>> = mapOf(
     ),
 
     Teams.TEN to mapOf(
-        ColorTypes.PRIMARY to Color(0,21,50),
-        ColorTypes.SECONDARY to Color(68,149,210),
+        ColorTypes.PRIMARY to Color(68,149,210),
+        ColorTypes.SECONDARY to Color(0,21,50),
         ColorTypes.TERTIARY to Color(191,192,191),
     ),
 
