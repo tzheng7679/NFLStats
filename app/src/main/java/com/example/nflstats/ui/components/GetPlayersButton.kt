@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -15,16 +19,21 @@ import androidx.compose.ui.unit.em
 
 @Composable
 fun GetPlayersButton(onGetPlayers: () -> Unit) {
+    var adjustedFontSize by remember { mutableStateOf(2.0) }
     Spacer(Modifier.height(5.dp))
     Button(
         onClick = onGetPlayers,
-        modifier = Modifier.width(100.dp)
+        modifier = Modifier.width(100.dp).height(30.dp)
     ) {
         Text(
             text = "Get Players",
-            fontSize = 3.em,
+            fontSize = adjustedFontSize.em,
             textAlign = TextAlign.Center,
-            color = Color(255,255,255)
+            color = Color(255,255,255),
+            onTextLayout = {it ->
+                if(it.didOverflowWidth || it.didOverflowWidth)
+                    adjustedFontSize *= .5
+            }
         )
     }
 }

@@ -233,7 +233,7 @@ fun Header(entity: Entity, onAddEntity: (Entity) -> Unit, formattedName: Pair<St
             if(entity is Team) {
                 GetPlayersButton(onGetPlayers = onGetPlayers)
             }
-
+            
             OnAddEntityButton(entity = entity, onAddEntity = onAddEntity)
         }
         Spacer(modifier = Modifier.width(15.dp))
@@ -281,16 +281,8 @@ fun Header(entity: Entity, onAddEntity: (Entity) -> Unit, formattedName: Pair<St
                     maxLines = 1
                 )
             }
-
-            //Secondary Information
-            Text(
-                text = secondaryInformation,
-                textAlign = TextAlign.Left,
-                fontSize = 4.em, //size of font for team names
-                fontWeight = FontWeight.ExtraLight,
-                fontStyle = FontStyle.Italic, maxLines = 1
-            )
         }
+        OnAddEntityButton(entity = entity, onAddEntity = onAddEntity)
     }
 }
 

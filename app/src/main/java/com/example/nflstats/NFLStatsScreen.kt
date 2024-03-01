@@ -146,18 +146,10 @@ fun NFLStatsScreen(
                 onAddEntity = {
                     runBlocking {
                         if(it is Team) {
-                            Log.d("HelpMe", it.toString())
-                            Log.d("HelpMe", "----------_-----")
-                            Log.d("HelpMe", statSettingsUIState.value.teamSettingsList.toString())
                             statSettingsViewModel.upsert(it)
-                            Log.d("HelpMe", statSettingsUIState.value.teamSettingsList.toString())
                         }
                         else if(it is Player) {
-                            Log.d("HelpMe", it.toString())
-                            Log.d("HelpMe", "----------_-----")
-                            Log.d("HelpMe", statSettingsUIState.value.playerSettingsList.toString())
                             statSettingsViewModel.upsertPlayer(it)
-                            Log.d("HelpMe", statSettingsUIState.value.playerSettingsList.toString())
                         }
                     }
                 }
