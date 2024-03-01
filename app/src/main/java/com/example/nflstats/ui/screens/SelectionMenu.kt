@@ -38,7 +38,6 @@ import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
-import kotlinx.coroutines.runBlocking
 
 /**
  * Displays menu of options of type [E] (should only be either [Player] or [Team]).
@@ -46,19 +45,29 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun <E> SelectionMenu(status: Status, entities : List<E>, onCardClick : (E) -> Unit, onClear: (() -> Unit)? = null, imageModifier : Modifier, cardModifier : Modifier = defaultCardModifier, modifier: Modifier = Modifier) {
     when(status) {
-        Status.SUCCESS -> SuccessSelectionMenu<E>(entities = entities, onCardClick = onCardClick, imageModifier = imageModifier, onClear = onClear, cardModifier = cardModifier)
+        Status.SUCCESS -> SuccessSelectionMenu<E>(
+            entities = entities,
+            onCardClick = onCardClick,
+            onClear = onClear,
+            cardModifier = cardModifier
+        )
         Status.LOADING -> LoadingMenu()
         Status.FAILURE -> FailureMenu()
     }
 }
 
 @Composable
-fun <E> SuccessSelectionMenu(entities: List<E>, onCardClick: (E) -> Unit, onClear: (() -> Unit)?, imageModifier: Modifier, cardModifier: Modifier) {
+fun <E> SuccessSelectionMenu(
+    entities: List<E>,
+    onCardClick: (E) -> Unit,
+    onClear: (() -> Unit)?,
+    cardModifier: Modifier
+) {
     LazyColumn {
         entities.forEach {
             item {
                 Row(modifier = Modifier.padding(3.dp)) {
-                    EntityCard(entity = it, imageModifier = imageModifier, cardMod = cardModifier, onCardClick = onCardClick)
+                    EntityCard(entity = it, onCardClick = onCardClick, cardMod = cardModifier)
                 }
                 Spacer(Modifier.height(8.dp))
             }
@@ -73,7 +82,7 @@ fun SelectionPreview() {
     SelectionMenu(status = Status.SUCCESS, Teams.entries.map { Team(it) }, {}, imageModifier = defaultTeamImageModifier, cardModifier = defaultCardModifier)
 }
 @Composable
-fun <E> EntityCard(entity : E, onCardClick : (E) -> Unit, imageModifier : Modifier, cardMod : Modifier) {
+fun <E> EntityCard(entity: E, onCardClick: (E) -> Unit, cardMod: Modifier) {
     //Check to make sure it is a [Team] or [Player] (and for type safety, as properties of entity are accessed)
     if(entity is Entity) Card(
         modifier = cardMod.clickable{ onCardClick(entity) },
@@ -89,19 +98,17 @@ fun <E> EntityCard(entity : E, onCardClick : (E) -> Unit, imageModifier : Modifi
 
             val formattedName: Pair<String, String> = entity.formattedName
             Column {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
+                AutosizedText(
                     text = formattedName.first,
                     textAlign = TextAlign.Center,
-                    fontSize = 6.em, //size of font for team names
+                    baseSize = 5.5.em, //size of font for team names
                     fontWeight = FontWeight.Light,
                     fontStyle = FontStyle.Italic
                 )
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
+                AutosizedText(
                     text = formattedName.second,
                     textAlign = TextAlign.Center,
-                    fontSize = 9.4.em, //size of font for team names
+                    baseSize = 11.em, //size of font for team names
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -112,5 +119,5 @@ fun <E> EntityCard(entity : E, onCardClick : (E) -> Unit, imageModifier : Modifi
 @Composable
 @Preview
 fun EntityCardPreview() {
-    EntityCard(entity = Team(Teams.BUF), onCardClick = {}, imageModifier = defaultTeamImageModifier, cardMod = defaultCardModifier)
+    EntityCard(entity = Team(Teams.BUF), onCardClick = {}, cardMod = defaultCardModifier)
 }

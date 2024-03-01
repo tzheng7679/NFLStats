@@ -11,7 +11,7 @@ data class Stat(
     init {
         //add % sign to value if stat is a percentage stat
         value += when {
-            name.contains("%") -> "%"
+            name.contains("%") or name.contains(other = "percentage", ignoreCase = true) -> "%"
             else -> ""
         }
     }

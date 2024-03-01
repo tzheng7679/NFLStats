@@ -2,19 +2,12 @@ package com.example.nflstats
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -22,7 +15,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.nflstats.ui.StatViewModel
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.database.AppDataContainer
@@ -30,6 +22,7 @@ import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
 import com.example.nflstats.ui.StatSettingsViewModel
+import com.example.nflstats.ui.StatViewModel
 import com.example.nflstats.ui.screens.MainMenu
 import com.example.nflstats.ui.screens.SelectionMenu
 import com.example.nflstats.ui.screens.StatSettingsMenu
@@ -39,8 +32,6 @@ import com.example.nflstats.ui.theme.defaultPlayerImageModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlin.reflect.KClass
-import kotlin.reflect.KTypeParameter
 
 
 enum class Menus(@StringRes val title : Int) {
@@ -144,17 +135,19 @@ fun NFLStatsScreen(
                     viewModel.setPlayers()
                     navController.navigate(Menus.FromTeamPlayerSelectionMenu.name)
                 },
-                viewPlayer = it.arguments?.getBoolean("viewPlayer") ?: false,
                 onAddEntity = {
                     runBlocking {
                         if(it is Team) {
                             statSettingsViewModel.upsert(it)
+                            navController.navigate(Menus.StatSettingsChangeMenu.name + "/" + it.id + "/" + "false")
                         }
                         else if(it is Player) {
                             statSettingsViewModel.upsertPlayer(it)
+                            navController.navigate(Menus.StatSettingsChangeMenu.name + "/" + it.id + "/" + "true")
                         }
                     }
-                }
+                },
+                viewPlayer = it.arguments?.getBoolean("viewPlayer") ?: false
             )
         }
 
@@ -199,9 +192,9 @@ fun NFLStatsScreen(
                     options = runBlocking { statSettingsViewModel.getStatsShowMap(id = id, forPlayer = isPlayer) },
                     onUpdate = {
                         runBlocking {
-                            statSettingsViewModel.setUpdatedEntity(
-                                it, id, isPlayer
-                            )
+                            statSettingsViewModel.setUpdatedEntity(newStats = it, id = id, forPlayer = isPlayer)
+                            navController.navigateUp()
+                            navController.navigateUp()
                         }
                     }
                 )

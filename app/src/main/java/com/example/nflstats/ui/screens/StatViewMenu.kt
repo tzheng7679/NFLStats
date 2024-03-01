@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
-import com.example.nflstats.ui.UIState
 import com.example.nflstats.data.idToAbbr
 import com.example.nflstats.data.sampleStats
 import com.example.nflstats.data.teamImageMap
@@ -49,6 +48,7 @@ import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
 import com.example.nflstats.model.statInList
+import com.example.nflstats.ui.UIState
 import com.example.nflstats.ui.components.FailureMenu
 import com.example.nflstats.ui.components.GetPlayersButton
 import com.example.nflstats.ui.components.LoadingMenu
@@ -67,7 +67,12 @@ import kotlin.math.min
  */
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, onAddEntity: (Entity) -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) {
+fun StatViewMenu(
+    uiState: UIState,
+    onGetPlayers: () -> Unit,
+    onAddEntity: (Entity) -> Unit,
+    viewPlayer: Boolean = false
+) {
     Log.d("HelpMe", "-------------")
     Log.d("HelpMe", idToAbbr[uiState.currTeam!!.id].toString())
     Log.d("HelpMe", "-------------")
@@ -86,8 +91,7 @@ fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, onAddEntity: (Entit
                 orientation = LocalConfiguration.current.orientation,
                 onGetPlayers = onGetPlayers,
                 onAddEntity = onAddEntity,
-                viewPlayer = viewPlayer,
-                modifier = modifier
+                viewPlayer = viewPlayer
             )
 
             Status.LOADING -> LoadingMenu()
@@ -100,10 +104,26 @@ fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, onAddEntity: (Entit
  * Function for displaying header and stats to screen
  */
 @Composable
-fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, onAddEntity: (Entity) -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) {
+fun SuccessMenu(
+    uiState: UIState,
+    orientation: Int,
+    onGetPlayers: () -> Unit,
+    onAddEntity: (Entity) -> Unit,
+    viewPlayer: Boolean = false
+) {
     when(orientation) {
-        Configuration.ORIENTATION_PORTRAIT -> PortraitSuccessMenu(uiState = uiState, onAddEntity = onAddEntity, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer)
-        else -> LandscapeSuccessMenu(uiState = uiState, onAddEntity = onAddEntity, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer)
+        Configuration.ORIENTATION_PORTRAIT -> PortraitSuccessMenu(
+            uiState = uiState,
+            onAddEntity = onAddEntity,
+            onGetPlayers = onGetPlayers,
+            viewPlayer = viewPlayer
+        )
+        else -> LandscapeSuccessMenu(
+            uiState = uiState,
+            onGetPlayers = onGetPlayers,
+            onAddEntity = onAddEntity,
+            viewPlayer = viewPlayer
+        )
     }
 }
 
@@ -112,7 +132,12 @@ fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, on
  * Portrait version of viewing stats
  */
 @Composable
-private fun PortraitSuccessMenu(uiState: UIState, onAddEntity: (Entity) -> Unit, onGetPlayers: () -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) {
+private fun PortraitSuccessMenu(
+    uiState: UIState,
+    onAddEntity: (Entity) -> Unit,
+    onGetPlayers: () -> Unit,
+    viewPlayer: Boolean
+) {
     val entity = when(viewPlayer) {
         false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
         true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
@@ -123,7 +148,11 @@ private fun PortraitSuccessMenu(uiState: UIState, onAddEntity: (Entity) -> Unit,
     }
     val statsToShow = entity.getStatsToShow()
     Scaffold(
-        topBar = @Composable { Header(entity = entity, onAddEntity = onAddEntity, secondaryInformation = entity.secondaryInformation, onGetPlayers = onGetPlayers) }
+        topBar = @Composable { Header(
+            entity = entity,
+            onAddEntity = onAddEntity,
+            onGetPlayers = onGetPlayers
+        ) }
     ) {
         LazyColumn(
             modifier = Modifier.padding(it),
@@ -147,7 +176,12 @@ private fun PortraitSuccessMenu(uiState: UIState, onAddEntity: (Entity) -> Unit,
  * Landscape version of viewing stats
  */
 @Composable
-private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, onAddEntity: (Entity) -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) {
+private fun LandscapeSuccessMenu(
+    uiState: UIState,
+    onGetPlayers: () -> Unit,
+    onAddEntity: (Entity) -> Unit,
+    viewPlayer: Boolean
+) {
     val entity = when(viewPlayer) {
         false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
         true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
@@ -160,7 +194,7 @@ private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, onA
 
     val it = 5.dp
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier) {
-        Lefter(entity = entity, secondaryInformation = "DSLKFJLSDJFLDSJF", onGetPlayers = onGetPlayers, onAddEntity = onAddEntity)
+        Lefter(entity = entity, onAddEntity = onAddEntity, onGetPlayers = onGetPlayers)
         LazyColumn(
             modifier = Modifier.padding(it),
             verticalArrangement = Arrangement.spacedBy((5).dp)
@@ -243,9 +277,13 @@ fun StatCard(stat: Stat) {
  * Header for the stat viewing menu
  */
 @Composable
-fun Header(entity: Entity, onAddEntity: (Entity) -> Unit, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, onGetPlayers: () -> Unit, modifier : Modifier = Modifier) {
-    val width = min(LocalConfiguration.current.screenWidthDp, LocalConfiguration.current.screenHeightDp)
-
+fun Header(
+    entity: Entity,
+    onAddEntity: (Entity) -> Unit,
+    formattedName: Pair<String, String> = entity.formattedName,
+    onGetPlayers: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -263,56 +301,20 @@ fun Header(entity: Entity, onAddEntity: (Entity) -> Unit, formattedName: Pair<St
         }
         Spacer(modifier = Modifier.width(15.dp))
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy((-5).dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy((-10).dp)
-            ) {
-                val firstFontSize = calculateHeaderFontSize(
-                    formattedName.first,
-                    maxFont = 9.0,
-                    maxScore = 16.0,
-                    screenWidth = width
-                ) { it.length.toDouble() }
+        HeaderBody(formattedName = formattedName, align = TextAlign.Left, fontSize1 = 8.0, fontSize2 = 15.5)
 
-                //First name OR Team city
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = formattedName.first,
-                    textAlign = TextAlign.Left,
-                    fontSize = firstFontSize.em, //size of font for team names
-                    fontWeight = FontWeight.Light,
-                    fontStyle = FontStyle.Italic
-                )
-
-                //THANKS DAN SNYDER, for making me write something to change the font size
-                val secondFontSize : Double = calculateHeaderFontSize(
-                    name = formattedName.second,
-                    maxFont = 13.0,
-                    maxScore = 7.0,
-                    screenWidth = width
-                ) { it.length.toDouble() }
-
-                //Team nickname
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = formattedName.second,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Left,
-                    fontSize = secondFontSize.em, //size of font for team names
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
-                )
-            }
-        }
         OnAddEntityButton(entity = entity, onAddEntity = onAddEntity)
     }
 }
 
 @Composable
-fun Lefter(entity: Entity, onAddEntity: (Entity) -> Unit, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) {
+fun Lefter(
+    entity: Entity,
+    onAddEntity: (Entity) -> Unit,
+    formattedName: Pair<String, String> = entity.formattedName,
+    onGetPlayers: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val width = min(LocalConfiguration.current.screenWidthDp, LocalConfiguration.current.screenHeightDp)
 
     Column(
@@ -326,60 +328,7 @@ fun Lefter(entity: Entity, onAddEntity: (Entity) -> Unit, formattedName: Pair<St
 
         Spacer(modifier = Modifier.width(15.dp))
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy((-5).dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy((-10).dp)
-            ) {
-                val firstFontSize = calculateHeaderFontSize(
-                    formattedName.first,
-                    maxFont = 9.0,
-                    maxScore = 256.0,
-                    screenWidth = width
-                ) { it.length.toDouble() * it.length.toDouble() }
-
-                //First name OR Team city
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = formattedName.first,
-                    textAlign = TextAlign.Center,
-                    fontSize = firstFontSize.em, //size of font for team names
-                    fontWeight = FontWeight.Light,
-                    fontStyle = FontStyle.Italic
-                )
-
-                //THANKS DAN SNYDER, for making me write something to change the font size
-                val secondFontSize : Double = calculateHeaderFontSize(
-                    name = formattedName.second,
-                    maxFont = 19.0,
-                    maxScore = 49.0,
-                    screenWidth = width
-                ) { it.length.toDouble() * it.length.toDouble() }
-
-                //Team nickname
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = formattedName.second,
-                    textAlign = TextAlign.Center,
-                    fontSize = secondFontSize.em, //size of font for team names
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            //Secondary Information
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = secondaryInformation,
-                textAlign = TextAlign.Center,
-                fontSize = 4.em, //size of font for team names
-                fontWeight = FontWeight.ExtraLight,
-                fontStyle = FontStyle.Italic, maxLines = 1
-            )
-        }
+        HeaderBody(formattedName = formattedName, align = TextAlign.Center, fontSize1 = 7.5, fontSize2 = 16.0)
 
         if(entity is Team) {
             GetPlayersButton(onGetPlayers = onGetPlayers)
@@ -388,12 +337,45 @@ fun Lefter(entity: Entity, onAddEntity: (Entity) -> Unit, formattedName: Pair<St
         OnAddEntityButton(entity, onAddEntity)
     }
 }
+
+@Composable
+fun HeaderBody(formattedName: Pair<String, String>, align: TextAlign, fontSize1: Double, fontSize2: Double) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy((-5).dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy((-10).dp)
+        ) {
+            //First name OR Team city
+            AutosizedText(
+                text = formattedName.first,
+                textAlign = align,
+                baseSize = fontSize1.em, //size of font for team names
+                fontWeight = FontWeight.Light,
+                fontStyle = FontStyle.Italic
+            )
+
+            //Team nickname or player last name
+            AutosizedText(
+                text = formattedName.second,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = align,
+                baseSize = fontSize2.em, //size of font for team names
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
 @Preview(showBackground = true)
 fun VerticalStatViewMenuPreview() {
     val x = Team(Teams.WSH)
-    StatViewMenu(uiState = UIState(currTeam = x, currTeamStats = sampleStats, currTeamStatus = Status.SUCCESS), onAddEntity = {}, onGetPlayers = {})
+    StatViewMenu(
+        uiState = UIState(currTeam = x, currTeamStats = sampleStats, currTeamStatus = Status.SUCCESS),
+        onGetPlayers = {},
+        onAddEntity = {})
 }
 
 @Composable
@@ -401,15 +383,21 @@ fun VerticalStatViewMenuPreview() {
 @RequiresApi(Build.VERSION_CODES.R)
 fun HorizontalStatViewMenuPreview() {
     val x = Team(Teams.WSH)
-    StatViewMenu(uiState = UIState(currTeam = x, currTeamStats = sampleStats, currTeamStatus = Status.SUCCESS), onAddEntity = {}, onGetPlayers = {})
+    StatViewMenu(
+        uiState = UIState(currTeam = x, currTeamStats = sampleStats, currTeamStatus = Status.SUCCESS),
+        onGetPlayers = {},
+        onAddEntity = {})
 }
 
 @Composable
 @Preview(showBackground = true)
 fun HeaderPreview() {
     Column {
-        Header(Team(Teams.DAL), secondaryInformation = "FILLER", onGetPlayers = {}, onAddEntity = {})
-        Header(Player("Patrick", "Mahomes", 3139477, teamImageMap[Teams.KC]!!), secondaryInformation = "FILLER", onGetPlayers = {}, onAddEntity = {})
+        Header(Team(Teams.DAL), onAddEntity = {}, onGetPlayers = {})
+        Header(
+            Player("Patrick", "Mahomes", 3139477, teamImageMap[Teams.KC]!!),
+            onAddEntity = {},
+            onGetPlayers = {})
     }
 }
 
@@ -417,20 +405,4 @@ fun HeaderPreview() {
 @Preview
 fun StatCardPreview() {
     StatCard(Stat("Passing Yards", value = "4000", description = "Percentage of attempted passes completed", category = "Offense"))
-}
-
-private fun calculateHeaderFontSize(name: String, maxFont: Double, maxScore: Double, screenWidth: Int, scoreCalculator: (String) -> Double) : Double {
-    val score = scoreCalculator(name)
-    return when {
-        scoreCalculator(name) > maxScore ->
-            maxFont * (maxScore/score)
-        else -> maxFont
-    } * screenWidth / 400
-}
-private fun calculateStatCardBaseFontSize(name : String, value : String, maxFont : Double, maxLengthScore : Double, multiplier : Double, screenWidth: Int) : Double {
-    val lengthScore = name.length + (multiplier * 1.3) * value.length
-    return when {
-        lengthScore < maxLengthScore -> maxFont
-        else -> maxFont * (maxLengthScore/lengthScore)
-    } * screenWidth / 460
 }
