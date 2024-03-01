@@ -5,11 +5,16 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -57,8 +62,10 @@ fun NFLStatsScreen(
 ) {
     val appDataContainer: AppDataContainer = AppDataContainer(LocalContext.current)
     val statSettingsViewModel: StatSettingsViewModel = StatSettingsViewModel(appDataContainer.teamsRepo, appDataContainer.playersRepo)
+    statSettingsViewModel.build()
 
     val uiState by viewModel.uiState.collectAsState()
+    val statSettingsUIState = statSettingsViewModel.uiState.collectAsState()
 
     NavHost(navController = navController, startDestination = Menus.MainMenu.name) {
         //The main menu
@@ -138,14 +145,20 @@ fun NFLStatsScreen(
                 viewPlayer = it.arguments?.getBoolean("viewPlayer") ?: false,
                 onAddEntity = {
                     runBlocking {
-                        if(it is Team) statSettingsViewModel.upsert(it)
-                        else if(it is Player) statSettingsViewModel.upsert(it)
-                    }
-                    runBlocking {
-                        Log.d(
-                            "HelpMe",
-                            statSettingsViewModel.getAllTeams().first()?.toString() ?: ""
-                        )
+                        if(it is Team) {
+                            Log.d("HelpMe", it.toString())
+                            Log.d("HelpMe", "----------_-----")
+                            Log.d("HelpMe", statSettingsUIState.value.teamSettingsList.toString())
+                            statSettingsViewModel.upsert(it)
+                            Log.d("HelpMe", statSettingsUIState.value.teamSettingsList.toString())
+                        }
+                        else if(it is Player) {
+                            Log.d("HelpMe", it.toString())
+                            Log.d("HelpMe", "----------_-----")
+                            Log.d("HelpMe", statSettingsUIState.value.playerSettingsList.toString())
+                            statSettingsViewModel.upsertPlayer(it)
+                            Log.d("HelpMe", statSettingsUIState.value.playerSettingsList.toString())
+                        }
                     }
                 }
             )
@@ -163,17 +176,21 @@ fun NFLStatsScreen(
             arguments = listOf(navArgument("forPlayer") { type = NavType.BoolType })
         ) {
             SelectionMenu(
-                entities = runBlocking {
-                    when (it.arguments?.getBoolean("forPlayer") ?: false) {
-                        true -> statSettingsViewModel.getAllPlayers().first() ?: emptyList()
-                        false -> statSettingsViewModel.getAllTeams().first() ?: emptyList()
-                    }
-                }.sortedBy { it.formattedName.first },
+                entities = when (it.arguments?.getBoolean("forPlayer") ?: false) {
+                        true -> statSettingsUIState.value.playerSettingsList ?: emptyList()
+                        false -> statSettingsUIState.value.teamSettingsList ?: emptyList()
+                    }.sortedBy { it.formattedName.first },
                 onCardClick = { player ->
                     navController.navigate(Menus.StatSettingsChangeMenu.name + "/" + player.id + "/")
                 },
                 imageModifier = defaultPlayerImageModifier,
-                status = Status.SUCCESS
+                status = Status.SUCCESS,
+                onClear = {
+                    when (it.arguments?.getBoolean("forPlayer") ?: false) {
+                        true -> runBlocking {statSettingsViewModel.clearPlayers()}
+                        false -> runBlocking {statSettingsViewModel.clearTeams()}
+                    }
+                }
             )
         }
 

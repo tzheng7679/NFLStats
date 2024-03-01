@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,21 +38,22 @@ import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
+import kotlinx.coroutines.runBlocking
 
 /**
  * Displays menu of options of type [E] (should only be either [Player] or [Team]).
  */
 @Composable
-fun <E> SelectionMenu(status: Status, entities : List<E>, onCardClick : (E) -> Unit, imageModifier : Modifier, cardModifier : Modifier = defaultCardModifier, modifier: Modifier = Modifier) {
+fun <E> SelectionMenu(status: Status, entities : List<E>, onCardClick : (E) -> Unit, onClear: (() -> Unit)? = null, imageModifier : Modifier, cardModifier : Modifier = defaultCardModifier, modifier: Modifier = Modifier) {
     when(status) {
-        Status.SUCCESS -> SuccessSelectionMenu<E>(entities = entities, onCardClick = onCardClick, imageModifier = imageModifier, cardModifier = cardModifier)
+        Status.SUCCESS -> SuccessSelectionMenu<E>(entities = entities, onCardClick = onCardClick, imageModifier = imageModifier, onClear = onClear, cardModifier = cardModifier)
         Status.LOADING -> LoadingMenu()
         Status.FAILURE -> FailureMenu()
     }
 }
 
 @Composable
-fun <E> SuccessSelectionMenu(entities : List<E>, onCardClick : (E) -> Unit, imageModifier : Modifier, cardModifier : Modifier) {
+fun <E> SuccessSelectionMenu(entities: List<E>, onCardClick: (E) -> Unit, onClear: (() -> Unit)?, imageModifier: Modifier, cardModifier: Modifier) {
     LazyColumn {
         entities.forEach {
             item {
@@ -61,13 +63,14 @@ fun <E> SuccessSelectionMenu(entities : List<E>, onCardClick : (E) -> Unit, imag
                 Spacer(Modifier.height(8.dp))
             }
         }
+        if(onClear != null) item { FloatingActionButton(onClick = onClear, modifier = Modifier.fillMaxWidth().padding(15.dp)) { Text(text = "Clear all entities from storage") } }
     }
 }
 
 @Composable
 @Preview
 fun SelectionPreview() {
-    SelectionMenu(status = Status.SUCCESS, Teams.entries.map { Team(it) }, {}, imageModifier = defaultTeamImageModifier, defaultCardModifier)
+    SelectionMenu(status = Status.SUCCESS, Teams.entries.map { Team(it) }, {}, imageModifier = defaultTeamImageModifier, cardModifier = defaultCardModifier)
 }
 @Composable
 fun <E> EntityCard(entity : E, onCardClick : (E) -> Unit, imageModifier : Modifier, cardMod : Modifier) {

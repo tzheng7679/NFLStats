@@ -35,7 +35,7 @@ class StatViewModel : ViewModel() {
      */
     fun setTeam(team : Team) {
         _uiState.update { it.copy(currTeam = team) }
-        fetchAndSetStatValues()
+        fetchAndSetStatValues(false)
     }
 
     fun setPlayer(player: Player) {
@@ -87,15 +87,14 @@ class StatViewModel : ViewModel() {
                         stats.add(statAsObject)
                     }
                 }
-
+                setStats(stats, forPlayer)
                 setStatus(Status.SUCCESS)
             } catch (e: Exception) {
                 setStatus(Status.FAILURE)
                 Log.d("HelpMe", e.stackTraceToString())
             }
         }
-
-        setStats(stats, forPlayer)
+        Log.d("HelpMe", stats.toString())
     }
 
     private fun setStats(values : List<Stat>, forCurrPlayer: Boolean) {

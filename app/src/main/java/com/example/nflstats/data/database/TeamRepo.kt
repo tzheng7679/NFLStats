@@ -18,4 +18,7 @@ class TeamRepo(private val teamDao: TeamDao) {
         return teamDao.getFirst()
     }
 
+    suspend fun clearTeams() {
+        return teamDao.clearTeams()
+    }
 }
