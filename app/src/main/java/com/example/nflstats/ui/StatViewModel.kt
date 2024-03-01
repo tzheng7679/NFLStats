@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
+import com.example.nflstats.data.globalStats
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
@@ -31,13 +32,16 @@ class StatViewModel : ViewModel() {
     val uiState: StateFlow<UIState> = _uiState.asStateFlow()
 
     /**
-     * Updates currEntity to entity, and sets the statistical values to those of the entity
+     * Updates currPlayer to player, and sets the statistical values to those of the player
      */
     fun setTeam(team : Team) {
         _uiState.update { it.copy(currTeam = team) }
         fetchAndSetStatValues(false)
     }
-
+    
+    /**
+     * Updates currPlayer to player, and sets the statistical values to those of the player
+     */
     fun setPlayer(player: Player) {
         _uiState.update{ it.copy(currPlayer = player) }
         fetchAndSetStatValues(true)
@@ -66,9 +70,6 @@ class StatViewModel : ViewModel() {
                     id = currEntity.id,
                     type = currEntity.getType()
                 )
-
-                Log.d("HelpMe", fetched)
-
                 //parse JSON with kotlin deserializer, with unknown keys excluded because we don't need them
                 val json = Json {
                     ignoreUnknownKeys = true
@@ -88,13 +89,16 @@ class StatViewModel : ViewModel() {
                     }
                 }
                 setStats(stats, forPlayer)
+                when(forPlayer) {
+                    true -> _uiState.update{ it.copy(it.currPlayer!!.apply { possibleStats = stats }) }
+                    false -> _uiState.update{ it.copy(it.currTeam!!.apply { possibleStats = stats }) }
+                }
                 setStatus(Status.SUCCESS)
             } catch (e: Exception) {
                 setStatus(Status.FAILURE)
                 Log.d("HelpMe", e.stackTraceToString())
             }
         }
-        Log.d("HelpMe", stats.toString())
     }
 
     private fun setStats(values : List<Stat>, forCurrPlayer: Boolean) {
@@ -104,8 +108,6 @@ class StatViewModel : ViewModel() {
         }
     }
     fun setPlayers(team: Entity = _uiState.value.currTeam ?: Team(Teams.WSH)) {
-        Log.d("RunningMan", "Why they be running me, man?")
-
         setPlayerListStatus(status = Status.LOADING)
         val players = mutableListOf<Player>()
 

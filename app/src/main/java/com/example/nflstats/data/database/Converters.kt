@@ -22,4 +22,10 @@ object Converters {
 
     @TypeConverter
     fun idToAbbr(id: Int): Teams = idToAbbr[id]!!
+
+    @TypeConverter
+    fun posStatsToString(toEncode: List<Stat>): String = Json.encodeToString(toEncode)
+
+    @TypeConverter
+    fun stringToPosStat(toDecode: String): List<Stat> = Json.decodeFromString<List<Stat>>(toDecode)
 }

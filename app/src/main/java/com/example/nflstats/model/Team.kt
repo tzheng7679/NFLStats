@@ -1,8 +1,10 @@
 package com.example.nflstats.model
+import android.util.Log
 import androidx.room.PrimaryKey
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.abbrToID
 import com.example.nflstats.data.database.Converters
+import com.example.nflstats.data.globalStats
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.data.teamNameMap
 
@@ -15,7 +17,8 @@ data class Team(
     @PrimaryKey override val id: Int = abbrToID[abbr] ?: 1,
     override val imageID: Int = teamImageMap[abbr] ?: 0,
     override var uniqueAdds : MutableSet<Stat> = mutableSetOf<Stat>(),
-    override var uniqueSubs: MutableSet<Stat> = mutableSetOf<Stat>()
+    override var uniqueSubs: MutableSet<Stat> = mutableSetOf<Stat>(),
+    override var possibleStats: List<Stat> = globalStats
 ) : Entity() {
     override val formattedName: Pair<String, String>
             get() {
@@ -24,7 +27,6 @@ data class Team(
 
                 return Pair(x.substring(0, z), x.substring(z + 1))
             }
-
     /**
      * Returns URL linking to player splits for year
      */
@@ -39,6 +41,13 @@ data class Team(
         throw NotImplementedError()
     }
 
+    override fun getStatsToShow(): Set<Stat> {
+        Log.d("HelpMe", possibleStats.toString())
+        Log.d("HelpMe", uniqueAdds.toString())
+        Log.d("HelpMe", uniqueSubs.toString())
+        Log.d("HelpMe", (possibleStats union uniqueAdds subtract uniqueSubs).toString())
+        return possibleStats union uniqueAdds subtract uniqueSubs
+    }
     /**
      * Returns divisional place in format "{Place} in {Division}"
      */

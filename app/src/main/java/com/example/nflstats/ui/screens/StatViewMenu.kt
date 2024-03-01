@@ -4,6 +4,7 @@ package com.example.nflstats.ui.screens
 
 import android.content.res.Configuration
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -47,6 +48,7 @@ import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
+import com.example.nflstats.model.statInList
 import com.example.nflstats.ui.components.FailureMenu
 import com.example.nflstats.ui.components.GetPlayersButton
 import com.example.nflstats.ui.components.LoadingMenu
@@ -66,7 +68,9 @@ import kotlin.math.min
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, onAddEntity: (Entity) -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) =
-    StatViewTheme(teamColorMap[idToAbbr[uiState.currTeam!!.id]]!!) {
+    StatViewTheme(
+        teamColorMap[idToAbbr[uiState.currTeam!!.id]]!!
+    ) {
         when(
             when(viewPlayer) {true -> uiState.currPlayerStatus false -> uiState.currTeamStatus}
         ) {
@@ -101,7 +105,7 @@ private fun PortraitSuccessMenu(uiState: UIState, onAddEntity: (Entity) -> Unit,
         false -> uiState.currTeamStats ?: emptyList<Stat>()
         true -> uiState.currPlayerStats ?: emptyList<Stat>()
     }
-
+    val statsToShow = entity.getStatsToShow()
     Scaffold(
         topBar = @Composable { Header(entity = entity, onAddEntity = onAddEntity, secondaryInformation = entity.secondaryInformation, onGetPlayers = onGetPlayers) }
     ) {
@@ -109,10 +113,14 @@ private fun PortraitSuccessMenu(uiState: UIState, onAddEntity: (Entity) -> Unit,
             modifier = Modifier.padding(it),
             verticalArrangement = Arrangement.spacedBy((5).dp)
         ) {
-            stats.forEach {
-                item {
-                    Spacer(modifier = Modifier.height(5.dp))
-                    StatCard(it)
+            Log.d("HelpMe", entity.possibleStats.toString())
+            stats.forEach {stat ->
+                Log.d("HelpMe", stat.toString())
+                if(statInList(stat, statsToShow)) {
+                    item {
+                        Spacer(modifier = Modifier.height(5.dp))
+                        StatCard(stat)
+                    }
                 }
             }
         }
@@ -132,6 +140,7 @@ private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, onA
         false -> uiState.currTeamStats ?: emptyList<Stat>()
         true -> uiState.currPlayerStats ?: emptyList<Stat>()
     }
+    val statsToShow = entity.getStatsToShow()
 
     val it = 5.dp
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier) {
@@ -140,10 +149,10 @@ private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, onA
             modifier = Modifier.padding(it),
             verticalArrangement = Arrangement.spacedBy((5).dp)
         ) {
-            stats.forEach {
-                item {
+            stats.forEach {stat ->
+                if(statInList(stat, statsToShow)) item {
                     Spacer(modifier = Modifier.height(5.dp))
-                    StatCard(it)
+                    StatCard(stat)
                 }
             }
         }

@@ -7,12 +7,22 @@ data class Stat(
     val name: String,
     var value: String,
     val description: String,
-    val category: String = "") {
+    val category: String) {
     init {
         //add % sign to value if stat is a percentage stat
         value += when {
             name.contains("%") -> "%"
             else -> ""
+        }
+    }
+
+    /**
+     * For our purposes, we only need to compare stats when we only desire they are describing the same thing, but not necessarily at the same time (basically they are the same stat, but not the same value)
+     */
+    override fun equals(other: Any?): Boolean {
+        return when(other is Stat) {
+            true -> name == other.name && category == other.category
+            false -> false
         }
     }
 }

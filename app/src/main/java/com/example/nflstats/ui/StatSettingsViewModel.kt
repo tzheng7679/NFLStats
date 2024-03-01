@@ -1,12 +1,10 @@
 package com.example.nflstats.ui
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
-import androidx.room.Query
-import com.example.nflstats.data.database.AppDataContainer
 import com.example.nflstats.data.database.PlayerRepo
 import com.example.nflstats.data.database.TeamRepo
+import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
@@ -16,7 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 
 /**
  * ViewModel for the app; based mainly around doing every by itself after the Entity is set
@@ -47,11 +44,6 @@ class StatSettingsViewModel(
         return teams
     }
     fun getFirstTeam(): Flow<Team?> = teamsRepo.getFirst()
-    suspend fun getTeamSettings(id: Int): Set<Stat> {
-        val team = getTeam(id)
-
-        return team.first()?.uniqueSubs ?: emptySet()
-    }
 
     suspend fun clearTeams() {
         teamsRepo.clearTeams()
@@ -75,7 +67,6 @@ class StatSettingsViewModel(
     fun getAllPlayers(): Flow<List<Player>?> {
         val players = playersRepo.getAllPlayers()
         runBlocking {
-            Log.d("HelpMe", "Blah: " + players.first().toString())
             _uiState.update {
                 it.copy(playerSettingsList = players.first())
             }
@@ -84,11 +75,6 @@ class StatSettingsViewModel(
     }
     
     fun getFirstPlayer(): Flow<Player?> = playersRepo.getFirst()
-    suspend fun getPlayerSettings(id: Int): Set<Stat> {
-        val team = getPlayer(id)
-
-        return team.first()?.uniqueSubs ?: emptySet()
-    }
 
     suspend fun clearPlayers() {
         playersRepo.clearPlayers()
@@ -100,5 +86,34 @@ class StatSettingsViewModel(
     fun build() {
         getAllPlayers()
         getAllTeams()
+    }
+
+    suspend fun getStatsShowMap(id: Int, forPlayer: Boolean): Map<Stat, Boolean> {
+        val entity = when(forPlayer) {
+            true -> getPlayer(id)
+            false -> getTeam(id)
+        }.first()
+
+        val statsTrue = entity?.getStatsToShow() ?: emptySet()
+
+        return entity?.possibleStats?.associateWith { it in statsTrue } ?: emptyMap()
+    }
+
+    suspend fun setUpdatedEntity(newStats: Set<Stat>, id: Int, forPlayer: Boolean): Entity {
+        var subSet = mutableSetOf<Stat>()
+        val entity = when(forPlayer) {
+            true -> getPlayer(id)
+            false -> getTeam(id)
+        }.first()!!
+
+        entity.possibleStats.forEach {prevStat ->
+            if(prevStat !in newStats) subSet.add(prevStat)
+        }
+        val newEntity = entity.apply { uniqueSubs = subSet }
+
+        if(newEntity is Player) upsertPlayer(newEntity)
+        else if(newEntity is Team) upsert(newEntity)
+
+        return newEntity
     }
 }

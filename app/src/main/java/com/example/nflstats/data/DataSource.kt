@@ -165,12 +165,12 @@ val sampleStats = listOf(
 )
 
 val globalStats = listOf(
-    Stat("Completion Percentage", "-1", "The percentage of completed passes.", "Passing"),
+    Stat(name="Completion Percentage", value="-1", description="The percentage of completed passes.", category="Passing"),
     Stat("Net Passing Yards" , "-1", "The amount of yards passing", "Passing"),
     Stat("Passing Touchdowns", "-1", "The total number of passing touchdowns.", "Passing"),
     Stat("Interceptions", "-1", "The number of passes thrown that were intercepted by the opposing team.", "Passing"),
     Stat("Passer Rating", "-1", "Passer Rating", "Passing"),
-    Stat("Rushing Yards", "-1", "The total rushing yards.", category = "Rushing"),
+    Stat("Rushing Yards", "-1", "The total rushing yards.", "Rushing"),
     Stat("Rushing Touchdowns", "-1", "The total number of rushing touchdowns.", category = "Rushing")
 )
 

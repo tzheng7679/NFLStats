@@ -83,7 +83,7 @@ fun NFLStatsScreen(
             //! IMPORTANT *******************
             //! NOTE: CHANGE OPTIONS LATER SO IT USES SYSTEM STORED OBJECTS, NOT NEWLY CREATED ONES
             //! IMPORTANT *******************
-            val options = Teams.entries.map { Team(it) }
+            //! val options = Teams.entries.map { Team(it) }
             SelectionMenu<Team>(
                 //can assume that teams will be succesfuly created
                 status = Status.SUCCESS,
@@ -107,9 +107,10 @@ fun NFLStatsScreen(
         composable(route = Menus.FromTeamPlayerSelectionMenu.name) {
             SelectionMenu<Player>(
                 status = uiState.currPlayerListStatus,
-                entities = (uiState.currPlayerList?: emptyList()).sortedBy { it.formattedName.second } ?: emptyList(),
+                entities = (uiState.currPlayerList?: emptyList()).sortedBy { it.formattedName.second },
                 onCardClick = {
                     viewModel.setPlayer(player = it)
+                    val x = uiState.currPlayer
                     navController.navigate(Menus.StatViewMenu.name + "/" + "true")
                 },
                 imageModifier = defaultPlayerImageModifier
@@ -173,8 +174,8 @@ fun NFLStatsScreen(
                         true -> statSettingsUIState.value.playerSettingsList ?: emptyList()
                         false -> statSettingsUIState.value.teamSettingsList ?: emptyList()
                     }.sortedBy { it.formattedName.first },
-                onCardClick = { player ->
-                    navController.navigate(Menus.StatSettingsChangeMenu.name + "/" + player.id + "/")
+                onCardClick = { entity ->
+                    navController.navigate(Menus.StatSettingsChangeMenu.name + "/" + entity.id + "/" + "${entity is Player}")
                 },
                 imageModifier = defaultPlayerImageModifier,
                 status = Status.SUCCESS,
@@ -187,15 +188,24 @@ fun NFLStatsScreen(
             )
         }
 
-//        composable(
-//            route = Menus.StatSettingsChangeMenu.name + "/{id}/{isPlayer}",
-//            arguments = listOf(navArgument("id") { type = NavType.IntType}, navArgument("isPlayer") {type = NavType.BoolType})
-//        ) {
-//            StatsChangeMenu(
-//                options = {
-//                    viewModel.set
-//                }
-//            )
-//        }
+        composable(
+            route = Menus.StatSettingsChangeMenu.name + "/{id}/{isPlayer}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType}, navArgument("isPlayer") {type = NavType.BoolType})
+        ) {
+            val isPlayer = it.arguments?.getBoolean("isPlayer") ?: false
+            val id = it.arguments?.getInt("id")
+            if(id != null) {
+                StatsChangeMenu(
+                    options = runBlocking { statSettingsViewModel.getStatsShowMap(id = id, forPlayer = isPlayer) },
+                    onUpdate = {
+                        runBlocking {
+                            statSettingsViewModel.setUpdatedEntity(
+                                it, id, isPlayer
+                            )
+                        }
+                    }
+                )
+            }
+        }
     }
 }

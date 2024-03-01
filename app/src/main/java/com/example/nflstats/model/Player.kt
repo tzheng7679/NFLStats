@@ -1,5 +1,6 @@
 package com.example.nflstats.model
 import androidx.room.PrimaryKey
+import com.example.nflstats.data.globalStats
 
 /**
  * Represents an NFL player
@@ -11,11 +12,13 @@ data class Player(
     @PrimaryKey override val id: Int,
     override val imageID: Int,
     override var uniqueAdds : MutableSet<Stat> = mutableSetOf<Stat>(),
-    override var uniqueSubs : MutableSet<Stat> = mutableSetOf<Stat>()
+    override var uniqueSubs : MutableSet<Stat> = mutableSetOf<Stat>(),
+    override var possibleStats: List<Stat> = globalStats
 ) : Entity() {
 
     override val formattedName: Pair<String, String>
         get() = Pair(fName, lName)
+
 
     /**
      * Returns URL linking to player splits for year

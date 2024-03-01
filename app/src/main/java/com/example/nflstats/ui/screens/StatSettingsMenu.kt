@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nflstats.data.sampleStatOptions
+import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 
@@ -56,6 +57,49 @@ fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, 
     }
     Column(verticalArrangement = Arrangement.Bottom , horizontalAlignment = Alignment.CenterHorizontally) {
         //Column of options
+        FloatingActionButton(
+            onClick = {
+                val optionsOut = updatedOptions.filter { it.value }.keys
+                onUpdate(optionsOut)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Update")
+        }
+        //Select all
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = {
+                    updatedOptions.forEach { updatedOptions[it.key] = true}
+                })
+                .border(
+                    width = .5.dp,
+                    color = Color.Gray
+                )
+                .padding(5.dp)
+        ) {
+            Text(text = "Select all")
+        }
+        //Deselect all
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = {
+                    updatedOptions.forEach { updatedOptions[it.key] = false}
+                })
+                .border(
+                    width = .5.dp,
+                    color = Color.Gray
+                )
+                .padding(5.dp)
+        ) {
+            Text(text = "Deselect all")
+        }
         LazyColumn {
             updatedOptions.forEach { entry ->
                 item {
@@ -90,18 +134,8 @@ fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, 
                 }
             }
         }
-        FloatingActionButton(
-            onClick = {
-                val optionsOut = updatedOptions.filter { it.value }.keys
-                onUpdate(optionsOut)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Update")
-        }
     }
 }
-
 @Composable
 @Preview(showBackground = true)
 fun StatSettingsMenuPreview() {

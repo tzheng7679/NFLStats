@@ -1,5 +1,6 @@
 package com.example.nflstats.model
 
+import android.util.Log
 import androidx.room.Entity
 import java.util.Calendar
 
@@ -13,7 +14,7 @@ abstract class Entity() {
     abstract val formattedName : Pair<String, String>
     abstract val imageID : Int
     var secondaryInformation : String = "FILLER"
-
+    abstract var possibleStats: List<Stat>
     //base string for ESPN URL and a method to return the appropriate season
     companion object {
         const val BASE_URL = "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/"
@@ -51,7 +52,13 @@ abstract class Entity() {
     /**
      * Returns Set of string name for stats for this object
      */
-    open fun getStatNames(globalStats: Set<Stat>): Set<Stat> { return globalStats union uniqueAdds subtract uniqueSubs }
+    open fun getStatsToShow(): Set<Stat> {
+        Log.d("HelpMe", possibleStats.toString())
+        Log.d("HelpMe", uniqueAdds.toString())
+        Log.d("HelpMe", uniqueSubs.toString())
+        Log.d("HelpMe", (possibleStats union uniqueAdds subtract uniqueSubs).toString())
+        return possibleStats union uniqueAdds subtract uniqueSubs
+    }
 
     abstract fun getURLAddition() : String
     /**
