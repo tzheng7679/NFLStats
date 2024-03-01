@@ -96,6 +96,7 @@ fun NFLStatsScreen(
                     storedTeams
                }.sortedBy { it.formattedName.first },
                 onCardClick = { team ->
+                    val x = uiState.currTeamStats
                     viewModel.setTeam(team)
                     navController.navigate(Menus.StatViewMenu.name + "/" + "false")
                               },
@@ -110,7 +111,6 @@ fun NFLStatsScreen(
                 entities = (uiState.currPlayerList?: emptyList()).sortedBy { it.formattedName.second },
                 onCardClick = {
                     viewModel.setPlayer(player = it)
-                    val x = uiState.currPlayer
                     navController.navigate(Menus.StatViewMenu.name + "/" + "true")
                 },
                 imageModifier = defaultPlayerImageModifier

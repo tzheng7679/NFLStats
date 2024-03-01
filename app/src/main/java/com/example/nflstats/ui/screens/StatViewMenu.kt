@@ -67,18 +67,34 @@ import kotlin.math.min
  */
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, onAddEntity: (Entity) -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) =
+fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, onAddEntity: (Entity) -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) {
+    Log.d("HelpMe", "-------------")
+    Log.d("HelpMe", idToAbbr[uiState.currTeam!!.id].toString())
+    Log.d("HelpMe", "-------------")
+
     StatViewTheme(
         teamColorMap[idToAbbr[uiState.currTeam!!.id]]!!
     ) {
-        when(
-            when(viewPlayer) {true -> uiState.currPlayerStatus false -> uiState.currTeamStatus}
+        when (
+            when (viewPlayer) {
+                true -> uiState.currPlayerStatus
+                false -> uiState.currTeamStatus
+            }
         ) {
-            Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, onAddEntity = onAddEntity, viewPlayer = viewPlayer, modifier = modifier)
+            Status.SUCCESS -> SuccessMenu(
+                uiState = uiState,
+                orientation = LocalConfiguration.current.orientation,
+                onGetPlayers = onGetPlayers,
+                onAddEntity = onAddEntity,
+                viewPlayer = viewPlayer,
+                modifier = modifier
+            )
+
             Status.LOADING -> LoadingMenu()
             else -> FailureMenu()
         }
     }
+}
 
 /**
  * Function for displaying header and stats to screen

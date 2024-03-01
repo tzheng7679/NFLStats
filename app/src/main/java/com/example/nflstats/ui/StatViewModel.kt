@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
-import com.example.nflstats.data.globalStats
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
@@ -48,6 +47,10 @@ class StatViewModel : ViewModel() {
     }
 
     private fun fetchAndSetStatValues(forPlayer: Boolean = false) {
+        //Set it to null originally because it doesn't update otherwise (???)
+        // * DO NOT DELETE OHTERWISE IT WILL BREAK
+        setStats(null, forPlayer)
+
         val currEntity = when(forPlayer) {
             false -> _uiState.value.currTeam ?: Team(Teams.WSH)
             true -> _uiState.value.currPlayer ?: Player("Error", "Man", 1, teamImageMap[Teams.WSH]!!)
@@ -89,9 +92,11 @@ class StatViewModel : ViewModel() {
                     }
                 }
                 setStats(stats, forPlayer)
+
+
                 when(forPlayer) {
-                    true -> _uiState.update{ it.copy(it.currPlayer!!.apply { possibleStats = stats }) }
-                    false -> _uiState.update{ it.copy(it.currTeam!!.apply { possibleStats = stats }) }
+                    true -> _uiState.update{ it.copy(currPlayer = it.currPlayer!!.apply { possibleStats = stats }) }
+                    false -> _uiState.update{ it.copy(currTeam = it.currTeam!!.apply { possibleStats = stats }) }
                 }
                 setStatus(Status.SUCCESS)
             } catch (e: Exception) {
@@ -101,7 +106,7 @@ class StatViewModel : ViewModel() {
         }
     }
 
-    private fun setStats(values : List<Stat>, forCurrPlayer: Boolean) {
+    private fun setStats(values: List<Stat>?, forCurrPlayer: Boolean) {
         when(forCurrPlayer) {
             false -> _uiState.update { it.copy(currTeamStats = values) }
             true -> _uiState.update { it.copy(currPlayerStats = values) }
