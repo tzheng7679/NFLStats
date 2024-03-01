@@ -19,7 +19,7 @@ interface PlayerDao {
     fun getPlayer(id: Int): Flow<Player>
 
     @Query("SELECT * FROM players ORDER BY lName ASC")
-    fun getAllPlayers(id: Int): Flow<List<Player>>
+    fun getAllPlayers(): Flow<List<Player>>
 
     @Query("SELECT * FROM players LIMIT 1")
     fun getFirst(): Flow<Player>

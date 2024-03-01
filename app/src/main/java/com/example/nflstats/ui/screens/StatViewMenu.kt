@@ -50,6 +50,7 @@ import com.example.nflstats.model.Team
 import com.example.nflstats.ui.components.FailureMenu
 import com.example.nflstats.ui.components.GetPlayersButton
 import com.example.nflstats.ui.components.LoadingMenu
+import com.example.nflstats.ui.components.OnAddEntityButton
 import com.example.nflstats.ui.components.imageCircle
 import com.example.nflstats.ui.theme.StatViewTheme
 import com.example.nflstats.ui.theme.defaultCardModifier
@@ -64,12 +65,12 @@ import kotlin.math.min
  */
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) =
+fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, onAddEntity: (Entity) -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) =
     StatViewTheme(teamColorMap[idToAbbr[uiState.currTeam!!.id]]!!) {
         when(
             when(viewPlayer) {true -> uiState.currPlayerStatus false -> uiState.currTeamStatus}
         ) {
-            Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer, modifier = modifier)
+            Status.SUCCESS -> SuccessMenu(uiState = uiState, orientation = LocalConfiguration.current.orientation, onGetPlayers = onGetPlayers, onAddEntity = onAddEntity, viewPlayer = viewPlayer, modifier = modifier)
             Status.LOADING -> LoadingMenu()
             else -> FailureMenu()
         }
@@ -79,10 +80,10 @@ fun StatViewMenu(uiState: UIState, onGetPlayers: () -> Unit, viewPlayer: Boolean
  * Function for displaying header and stats to screen
  */
 @Composable
-fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) {
+fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, onAddEntity: (Entity) -> Unit, viewPlayer: Boolean = false, modifier: Modifier = Modifier) {
     when(orientation) {
-        Configuration.ORIENTATION_PORTRAIT -> PortraitSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer)
-        else -> LandscapeSuccessMenu(uiState = uiState, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer)
+        Configuration.ORIENTATION_PORTRAIT -> PortraitSuccessMenu(uiState = uiState, onAddEntity = onAddEntity, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer)
+        else -> LandscapeSuccessMenu(uiState = uiState, onAddEntity = onAddEntity, onGetPlayers = onGetPlayers, viewPlayer = viewPlayer)
     }
 }
 
@@ -91,7 +92,7 @@ fun SuccessMenu(uiState: UIState, orientation: Int, onGetPlayers: () -> Unit, vi
  * Portrait version of viewing stats
  */
 @Composable
-private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) {
+private fun PortraitSuccessMenu(uiState: UIState, onAddEntity: (Entity) -> Unit, onGetPlayers: () -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) {
     val entity = when(viewPlayer) {
         false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
         true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
@@ -102,7 +103,7 @@ private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, view
     }
 
     Scaffold(
-        topBar = @Composable { Header(entity = entity, secondaryInformation = entity.secondaryInformation, onGetPlayers = onGetPlayers) }
+        topBar = @Composable { Header(entity = entity, onAddEntity = onAddEntity, secondaryInformation = entity.secondaryInformation, onGetPlayers = onGetPlayers) }
     ) {
         LazyColumn(
             modifier = Modifier.padding(it),
@@ -122,7 +123,7 @@ private fun PortraitSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, view
  * Landscape version of viewing stats
  */
 @Composable
-private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) {
+private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, onAddEntity: (Entity) -> Unit, viewPlayer: Boolean, modifier: Modifier = Modifier) {
     val entity = when(viewPlayer) {
         false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
         true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
@@ -134,7 +135,7 @@ private fun LandscapeSuccessMenu(uiState: UIState, onGetPlayers: () -> Unit, vie
 
     val it = 5.dp
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier) {
-        Lefter(entity = entity, secondaryInformation = "DSLKFJLSDJFLDSJF", onGetPlayers = onGetPlayers)
+        Lefter(entity = entity, secondaryInformation = "DSLKFJLSDJFLDSJF", onGetPlayers = onGetPlayers, onAddEntity = onAddEntity)
         LazyColumn(
             modifier = Modifier.padding(it),
             verticalArrangement = Arrangement.spacedBy((5).dp)
@@ -217,7 +218,7 @@ fun StatCard(stat: Stat) {
  * Header for the stat viewing menu
  */
 @Composable
-fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, onGetPlayers: () -> Unit, modifier : Modifier = Modifier) {
+fun Header(entity: Entity, onAddEntity: (Entity) -> Unit, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, onGetPlayers: () -> Unit, modifier : Modifier = Modifier) {
     val width = min(LocalConfiguration.current.screenWidthDp, LocalConfiguration.current.screenHeightDp)
 
     Row(
@@ -232,6 +233,8 @@ fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formatte
             if(entity is Team) {
                 GetPlayersButton(onGetPlayers = onGetPlayers)
             }
+
+            OnAddEntityButton(entity = entity, onAddEntity = onAddEntity)
         }
         Spacer(modifier = Modifier.width(15.dp))
 
@@ -292,7 +295,7 @@ fun Header(entity: Entity, formattedName: Pair<String, String> = entity.formatte
 }
 
 @Composable
-fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) {
+fun Lefter(entity: Entity, onAddEntity: (Entity) -> Unit, formattedName: Pair<String, String> = entity.formattedName, secondaryInformation: String, onGetPlayers: () -> Unit, modifier: Modifier = Modifier) {
     val width = min(LocalConfiguration.current.screenWidthDp, LocalConfiguration.current.screenHeightDp)
 
     Column(
@@ -364,6 +367,8 @@ fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formatte
         if(entity is Team) {
             GetPlayersButton(onGetPlayers = onGetPlayers)
         }
+
+        OnAddEntityButton(entity, onAddEntity)
     }
 }
 @RequiresApi(Build.VERSION_CODES.R)
@@ -371,7 +376,7 @@ fun Lefter(entity: Entity, formattedName: Pair<String, String> = entity.formatte
 @Preview(showBackground = true)
 fun VerticalStatViewMenuPreview() {
     val x = Team(Teams.WSH)
-    StatViewMenu(uiState = UIState(currTeam = x, currTeamStats = sampleStats, currTeamStatus = Status.SUCCESS), {})
+    StatViewMenu(uiState = UIState(currTeam = x, currTeamStats = sampleStats, currTeamStatus = Status.SUCCESS), onAddEntity = {}, onGetPlayers = {})
 }
 
 @Composable
@@ -379,15 +384,15 @@ fun VerticalStatViewMenuPreview() {
 @RequiresApi(Build.VERSION_CODES.R)
 fun HorizontalStatViewMenuPreview() {
     val x = Team(Teams.WSH)
-    StatViewMenu(uiState = UIState(currTeam = x, currTeamStats = sampleStats, currTeamStatus = Status.SUCCESS), {})
+    StatViewMenu(uiState = UIState(currTeam = x, currTeamStats = sampleStats, currTeamStatus = Status.SUCCESS), onAddEntity = {}, onGetPlayers = {})
 }
 
 @Composable
 @Preview(showBackground = true)
 fun HeaderPreview() {
     Column {
-        Header(Team(Teams.DAL), secondaryInformation = "FILLER", onGetPlayers = {})
-        Header(Player("Patrick", "Mahomes", 3139477, teamImageMap[Teams.KC]!!), secondaryInformation = "FILLER", onGetPlayers = {})
+        Header(Team(Teams.DAL), secondaryInformation = "FILLER", onGetPlayers = {}, onAddEntity = {})
+        Header(Player("Patrick", "Mahomes", 3139477, teamImageMap[Teams.KC]!!), secondaryInformation = "FILLER", onGetPlayers = {}, onAddEntity = {})
     }
 }
 

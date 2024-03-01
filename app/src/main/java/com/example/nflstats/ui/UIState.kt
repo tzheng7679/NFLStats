@@ -15,5 +15,5 @@ data class UIState(
 
     var currPlayer: Entity? = null,
     var currPlayerStats: List<Stat>? = null,
-    var currPlayerStatus: Status = Status.LOADING
+    var currPlayerStatus: Status = Status.LOADING,
 )

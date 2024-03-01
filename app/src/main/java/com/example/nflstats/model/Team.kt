@@ -12,14 +12,11 @@ import com.example.nflstats.data.teamNameMap
 @androidx.room.Entity(tableName = "teams")
 data class Team(
     val abbr: Teams,
+    @PrimaryKey override val id: Int = abbrToID[abbr] ?: 1,
     override val imageID: Int = teamImageMap[abbr] ?: 0,
-    override var uniqueAdds: MutableSet<String> = mutableSetOf<String>(),
-    override var uniqueSubs: MutableSet<String> = mutableSetOf<String>()
+    override var uniqueAdds : MutableSet<Stat> = mutableSetOf<Stat>(),
+    override var uniqueSubs: MutableSet<Stat> = mutableSetOf<Stat>()
 ) : Entity() {
-    //The team's id
-    @PrimaryKey
-    override val id: Int = abbrToID[abbr] ?: 1
-
     override val formattedName: Pair<String, String>
             get() {
                 val x = teamNameMap[abbr]!!
@@ -48,6 +45,4 @@ data class Team(
     fun fetchDivisionPlace(): String {
         throw NotImplementedError()
     }
-
-    override fun getStatNames(globalStats: Set<String>): Set<String> { return globalStats union uniqueAdds subtract uniqueSubs }
 }

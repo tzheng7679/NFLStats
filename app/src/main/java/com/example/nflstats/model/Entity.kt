@@ -8,13 +8,13 @@ abstract class Entity() {
     //Have globalStats as the java equivalent of a static variable
     abstract val id : Int
 
-    abstract var uniqueAdds : MutableSet<String>
-    abstract var uniqueSubs : MutableSet<String>
+    abstract var uniqueAdds: MutableSet<Stat>
+    abstract var uniqueSubs : MutableSet<Stat>
     abstract val formattedName : Pair<String, String>
     abstract val imageID : Int
     var secondaryInformation : String = "FILLER"
 
-    //set of maps and base string for PFR URL
+    //base string for ESPN URL and a method to return the appropriate season
     companion object {
         const val BASE_URL = "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/"
 
@@ -51,18 +51,17 @@ abstract class Entity() {
     /**
      * Returns Set of string name for stats for this object
      */
-    abstract fun getStatNames(globalStats: Set<String>) : Set<String>
+    open fun getStatNames(globalStats: Set<Stat>): Set<Stat> { return globalStats union uniqueAdds subtract uniqueSubs }
 
     abstract fun getURLAddition() : String
     /**
      * Adds local stat to Entity
      */
-    open fun addLocalStat(name : String) { uniqueAdds.add(name) }
-
+    open fun addLocalStat(stat: Stat) = uniqueSubs.remove(stat)
     /**
      * Removes local stat from Entity
      */
-    open fun removeLocalStat(name : String) { uniqueSubs.remove(name) }
+    open fun removeLocalStat(stat: Stat) { uniqueSubs.remove(stat) }
 
     fun getType() : String {
         return when(this) {

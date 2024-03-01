@@ -8,6 +8,22 @@
       <entry key="StatViewMenuPreview">
         <State />
       </entry>
+      <entry key="StatsChangeMenuPreview">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\Tony Zheng\.android\avd\Pixel_7_Pro_API_34.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-02-29T15:42:39.539901Z" />
+        </State>
+      </entry>
       <entry key="TeamCard">
         <State />
       </entry>
@@ -26,9 +42,6 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-02-24T04:01:22.074997500Z" />
         </State>
-      </entry>
-      <entry key="useAppContext()">
-        <State />
       </entry>
     </value>
   </component>

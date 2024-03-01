@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.abbrToID
 import com.example.nflstats.data.idToAbbr
+import com.example.nflstats.model.Stat
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -12,9 +13,9 @@ import kotlinx.serialization.json.Json
  */
 object Converters {
     @TypeConverter
-    fun uniqueListToString(toEncode: MutableSet<String>): String = Json.encodeToString(toEncode)
+    fun uniqueListToString(toEncode: MutableSet<Stat>): String = Json.encodeToString(toEncode)
     @TypeConverter
-    fun toUniqueList(str: String): MutableSet<String> = Json.decodeFromString<MutableSet<String>>(str)
+    fun toUniqueList(str: String): MutableSet<Stat> = Json.decodeFromString<MutableSet<Stat>>(str)
 
     @TypeConverter
     fun abbrToId(abbr: Teams): Int = abbrToID[abbr]!!

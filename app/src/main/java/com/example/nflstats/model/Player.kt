@@ -9,10 +9,10 @@ data class Player(
     val fName: String,
     val lName: String,
     @PrimaryKey override val id: Int,
-    override val imageID: Int
+    override val imageID: Int,
+    override var uniqueAdds : MutableSet<Stat> = mutableSetOf<Stat>(),
+    override var uniqueSubs : MutableSet<Stat> = mutableSetOf<Stat>()
 ) : Entity() {
-    override var uniqueAdds : MutableSet<String> = mutableSetOf()
-    override var uniqueSubs : MutableSet<String> = mutableSetOf()
 
     override val formattedName: Pair<String, String>
         get() = Pair(fName, lName)
@@ -27,6 +27,4 @@ data class Player(
     fun fetchTeam(): String {
         throw NotImplementedError()
     }
-
-    override fun getStatNames(globalStats: Set<String>): Set<String> { return globalStats union uniqueAdds subtract uniqueSubs }
 }

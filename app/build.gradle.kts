@@ -75,7 +75,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     // UI Tests
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Optional - Included automatically by material, only add when you need

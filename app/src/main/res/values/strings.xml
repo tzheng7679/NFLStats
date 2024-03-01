@@ -12,4 +12,7 @@
     <string name="stat_view_menu_true">Stat View Menu True</string>
     <string name="stat_settings_menu_entry">Stat Settings Entry</string>
     <string name="stat_settings_menu">Stat Settings Menu</string>
+    <string name="stat_settings_change_menu">Stat Settings Change Menu</string>
+    <string name="false_string">false</string>
+    <string name="true_string">true\n</string>
 </resources>

@@ -163,3 +163,35 @@ val sampleStats = listOf(
     Stat("Passing LNG", "67", "Longest passing play", "Rushing"),
     Stat("Sacks", "27", "Amount of sacks taken", "Rushing")
 )
+
+val globalStats = listOf(
+    Stat("Completion Percentage", "-1", "The percentage of completed passes.", "Passing"),
+    Stat("Net Passing Yards" , "-1", "The amount of yards passing", "Passing"),
+    Stat("Passing Touchdowns", "-1", "The total number of passing touchdowns.", "Passing"),
+    Stat("Interceptions", "-1", "The number of passes thrown that were intercepted by the opposing team.", "Passing"),
+    Stat("Passer Rating", "-1", "Passer Rating", "Passing"),
+    Stat("Rushing Yards", "-1", "The total rushing yards.", category = "Rushing"),
+    Stat("Rushing Touchdowns", "-1", "The total number of rushing touchdowns.", category = "Rushing")
+)
+
+val sampleStatOptions = mapOf(
+    ssg("Touchdowns", "Passing"),
+    ssg("Interceptions", "Passing", true),
+    ssg("Passing Yards", "Passing"),
+    ssg("Rushing yards", "Rushing"),
+    ssg("Touchdowns", "Passing"),
+    ssg("Interceptions", "Passing"),
+    ssg("Passing Yards", "Passing"),
+    ssg("Rushing yards", "Rushing", true),
+    ssg("Touchdowns", "Passing"),
+    ssg("Interceptions", "Passing"),
+    ssg("Passing Yards", "Passing"),
+    ssg("Rushing yards", "Rushing"),
+    ssg("Touchdowns", "Passing"),
+    ssg("Interceptions", "Passing", true),
+    ssg("Passing Yards", "Passing"),
+    ssg("Rushing yards", "Rushing"),
+)
+fun ssg(name: String, category: String, activated: Boolean = false): Pair<Stat, Boolean> {
+    return Stat(name, "", "", category) to activated
+}

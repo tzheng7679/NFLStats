@@ -7,6 +7,6 @@ class PlayerRepo(private val playerDao: PlayerDao) {
 
     fun getPlayer(id: Int): Flow<Player?> { return playerDao.getPlayer(id) }
 
-    fun getAllPlayers(id: Int): Flow<List<Player>?> { return playerDao.getAllPlayers(id) }
+    fun getAllPlayers(): Flow<List<Player>?> { return playerDao.getAllPlayers() }
     fun getFirst(): Flow<Player?> { return playerDao.getFirst() }
 }

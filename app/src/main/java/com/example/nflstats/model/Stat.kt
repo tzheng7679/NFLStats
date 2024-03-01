@@ -1,5 +1,8 @@
 package com.example.nflstats.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Stat(
     val name: String,
     var value: String,
