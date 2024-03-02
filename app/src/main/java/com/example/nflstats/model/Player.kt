@@ -1,5 +1,6 @@
 package com.example.nflstats.model
 import androidx.room.PrimaryKey
+import com.example.nflstats.data.Teams
 import com.example.nflstats.data.globalStats
 
 /**
@@ -13,6 +14,7 @@ data class Player(
     override val imageID: Int,
     override var uniqueSubs : MutableSet<Stat> = mutableSetOf<Stat>(),
     override var possibleStats: List<Stat> = globalStats,
+    var team: Teams
 ) : Entity() {
 
     override val formattedName: Pair<String, String>

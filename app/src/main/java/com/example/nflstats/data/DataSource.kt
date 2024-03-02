@@ -80,8 +80,6 @@ val teamImageMap: Map<Teams, Int> = mapOf(
     Teams.WSH to R.drawable.was
 )
 
-val imageIdToAbbrMap = teamImageMap.map{ (k,v) -> v to k }.toMap()
-
 //maps teams to full names
 val teamNameMap: Map<Teams, String> = mapOf(
     Teams.ARI to "Arizona Cardinals",

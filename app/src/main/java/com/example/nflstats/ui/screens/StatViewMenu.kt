@@ -3,9 +3,7 @@
 package com.example.nflstats.ui.screens
 
 import android.content.res.Configuration
-import androidx.compose.ui.graphics.Color
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -33,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,7 +41,6 @@ import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.idToAbbr
-import com.example.nflstats.data.imageIdToAbbrMap
 import com.example.nflstats.data.sampleStats
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
@@ -56,7 +54,6 @@ import com.example.nflstats.ui.components.GetPlayersButton
 import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.OnAddEntityButton
 import com.example.nflstats.ui.components.imageCircle
-import com.example.nflstats.ui.theme.ColorTypes
 import com.example.nflstats.ui.theme.StatViewTheme
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultDescriptionModifier
@@ -77,7 +74,7 @@ fun StatViewMenu(
     viewPlayer: Boolean = false
 ) {
     StatViewTheme(
-        teamColorMap[idToAbbr[uiState.currTeam!!.id]]!!
+        teamColorMap[uiState.currTeam?.abbr ?: uiState.currPlayer!!.team]!!
     ) {
         when (
             when (viewPlayer) {
@@ -138,8 +135,8 @@ private fun PortraitSuccessMenu(
     viewPlayer: Boolean
 ) {
     val entity = when(viewPlayer) {
-        false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
-        true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
+        false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!, team = Teams.WSH)
+        true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!, team = Teams.WSH)
     }
     val stats = when(viewPlayer) {
         false -> uiState.currTeamStats ?: emptyList<Stat>()
@@ -180,8 +177,8 @@ private fun LandscapeSuccessMenu(
     viewPlayer: Boolean
 ) {
     val entity = when(viewPlayer) {
-        false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
-        true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!)
+        false -> uiState.currTeam ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!, team = Teams.WSH)
+        true -> uiState.currPlayer ?: Player("Error", "Player could not be found", -1, teamImageMap[Teams.WSH]!!, team = Teams.WSH)
     }
     val stats = when(viewPlayer) {
         false -> uiState.currTeamStats ?: emptyList<Stat>()
@@ -397,7 +394,7 @@ fun HeaderPreview() {
     Column {
         Header(Team(Teams.DAL), onAddEntity = {}, onGetPlayers = {})
         Header(
-            Player("Patrick", "Mahomes", 3139477, teamImageMap[Teams.KC]!!),
+            Player("Patrick", "Mahomes", 3139477, teamImageMap[Teams.KC]!!, team = Teams.KC),
             onAddEntity = {},
             onGetPlayers = {})
     }

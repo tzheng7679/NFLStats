@@ -53,7 +53,7 @@ class StatViewModel : ViewModel() {
 
         val currEntity = when(forPlayer) {
             false -> _uiState.value.currTeam ?: Team(Teams.WSH)
-            true -> _uiState.value.currPlayer ?: Player("Error", "Man", 1, teamImageMap[Teams.WSH]!!)
+            true -> _uiState.value.currPlayer ?: Player("Error", "Man", 1, teamImageMap[Teams.WSH]!!, team = Teams.WSH)
         }
 
         val setStatus: (Status) -> Unit = when(forPlayer) {
@@ -139,10 +139,11 @@ class StatViewModel : ViewModel() {
 
                         players.add(
                             Player(
-                            fName = resultPlayerInfo.firstName,
-                            lName = resultPlayerInfo.lastName,
-                            id = resultPlayerInfo.id.toInt(),
-                            imageID = team.imageID
+                                fName = resultPlayerInfo.firstName,
+                                lName = resultPlayerInfo.lastName,
+                                id = resultPlayerInfo.id.toInt(),
+                                imageID = team.imageID,
+                                team = _uiState.value.currTeam?.abbr ?: Teams.DET
                             )
                         )
                     }

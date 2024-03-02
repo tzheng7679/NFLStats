@@ -7,14 +7,14 @@ import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
 
 data class UIState(
-    var currTeam: Entity? = null,
+    var currTeam: Team? = null,
     var currTeamStats: List<Stat>? = null,
     var currTeamStatus: Status = Status.LOADING,
 
     var currPlayerList: List<Player>? = emptyList(),
     var currPlayerListStatus: Status = Status.LOADING,
 
-    var currPlayer: Entity? = null,
+    var currPlayer: Player? = null,
     var currPlayerStats: List<Stat>? = null,
     var currPlayerStatus: Status = Status.LOADING,
 

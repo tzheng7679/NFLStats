@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
+import com.example.nflstats.data.idToAbbr
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
@@ -37,8 +38,11 @@ import com.example.nflstats.ui.components.ActionButton
 import com.example.nflstats.ui.components.FailureMenu
 import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.imageCircle
+import com.example.nflstats.ui.theme.ColorTypes
+import com.example.nflstats.ui.theme.StatViewTheme
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultTeamImageModifier
+import com.example.nflstats.ui.theme.teamColorMap
 
 /**
  * Displays menu of options of type [E] (should only be either [Player] or [Team]).
@@ -85,33 +89,44 @@ fun SelectionPreview() {
 @Composable
 fun <E> EntityCard(entity: E, onCardClick: (E) -> Unit, cardMod: Modifier) {
     //Check to make sure it is a [Team] or [Player] (and for type safety, as properties of entity are accessed)
-    if(entity is Entity) Card(
-        modifier = cardMod.clickable{ onCardClick(entity) },
-    ) {
-        Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Spacer(Modifier.width(20.dp))
+    if(entity is Entity) {
+        val colors: Map<ColorTypes, Color> = when {
+            entity is Player -> teamColorMap[entity.team]
+            entity is Team -> teamColorMap[entity.abbr]
+            else -> emptyMap()
+        }!!
 
-            imageCircle(id = entity.imageID, imageModifier = defaultTeamImageModifier
-                .border(
-                    BorderStroke(4.dp, Color(128,128,128)), CircleShape
-                )
-            )
+        StatViewTheme(colors) {
+            Card(
+                modifier = cardMod.clickable { onCardClick(entity) },
+            ) {
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(Modifier.width(20.dp))
 
-            val formattedName: Pair<String, String> = entity.formattedName
-            Column {
-                AutosizedText(
-                    text = formattedName.first,
-                    textAlign = TextAlign.Center,
-                    baseSize = 5.5.em, //size of font for team names
-                    fontWeight = FontWeight.Light,
-                    fontStyle = FontStyle.Italic
-                )
-                AutosizedText(
-                    text = formattedName.second,
-                    textAlign = TextAlign.Center,
-                    baseSize = 11.em, //size of font for team names
-                    fontWeight = FontWeight.Bold
-                )
+                    imageCircle(
+                        id = entity.imageID, isPlayer = false
+                    )
+
+                    val formattedName: Pair<String, String> = entity.formattedName
+                    Column {
+                        AutosizedText(
+                            text = formattedName.first,
+                            textAlign = TextAlign.Center,
+                            baseSize = 5.5.em, //size of font for team names
+                            fontWeight = FontWeight.Light,
+                            fontStyle = FontStyle.Italic
+                        )
+                        AutosizedText(
+                            text = formattedName.second,
+                            textAlign = TextAlign.Center,
+                            baseSize = 11.em, //size of font for team names
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         }
     }

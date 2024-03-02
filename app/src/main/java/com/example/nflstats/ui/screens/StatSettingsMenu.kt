@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,8 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nflstats.data.sampleStatOptions
 import com.example.nflstats.data.sortedCategories
-import com.example.nflstats.model.Entity
-import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.ui.components.ActionButton
 
@@ -102,7 +99,7 @@ fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, 
             Text(text = "Deselect all")
         }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         LazyColumn {
             orderedOptions.forEach { key ->
