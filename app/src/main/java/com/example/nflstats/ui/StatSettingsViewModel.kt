@@ -8,7 +8,7 @@ import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
-import com.example.nflstats.model.statInList
+import com.example.nflstats.model.statInCollection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -115,7 +115,7 @@ class StatSettingsViewModel(
 
         entity.possibleStats.forEach {prevStat ->
             //Construct the subset for the entity
-            if(!statInList(prevStat, newStats)) subSet.add(prevStat)
+            if(!statInCollection(prevStat, newStats)) subSet.add(prevStat)
         }
         val newEntity = entity.apply { uniqueSubs = subSet }
 
@@ -156,12 +156,19 @@ class StatSettingsViewModel(
      */
     suspend fun getStatSuperSet(isPlayer: Boolean): Set<Stat> {
         val superEntities = (if(isPlayer) getAllPlayers() else getAllTeams()).first() ?: emptyList()
-        var superSet = mutableSetOf<Stat>()
 
-        superEntities.forEach {
-            it.possibleStats.forEach { stat ->
-                superSet.add(stat)
+        //get all possible statistics for every entity desired
+        val allStats = mutableListOf<Stat>()
+        superEntities.forEach {entity ->
+            entity.possibleStats.forEach {
+                allStats.add(it)
             }
+        }
+
+        //create a superset of unique stats
+        var superSet = mutableSetOf<Stat>()
+        allStats.forEach { stat ->
+            if(!statInCollection(stat, superSet)) superSet.add(stat)
         }
 
         return superSet

@@ -31,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,14 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
-import com.example.nflstats.data.idToAbbr
 import com.example.nflstats.data.sampleStats
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
-import com.example.nflstats.model.statInList
+import com.example.nflstats.model.statInCollection
 import com.example.nflstats.ui.UIState
 import com.example.nflstats.ui.components.FailureMenu
 import com.example.nflstats.ui.components.GetPlayersButton
@@ -74,7 +72,7 @@ fun StatViewMenu(
     viewPlayer: Boolean = false
 ) {
     StatViewTheme(
-        teamColorMap[uiState.currTeam?.abbr ?: uiState.currPlayer!!.team]!!
+        colors = (if(viewPlayer) teamColorMap[uiState.currPlayer!!.team] else teamColorMap[uiState.currTeam?.abbr])!!
     ) {
         when (
             when (viewPlayer) {
@@ -155,7 +153,7 @@ private fun PortraitSuccessMenu(
             verticalArrangement = Arrangement.spacedBy((5).dp)
         ) {
             stats.forEach {stat ->
-                if(statInList(stat, statsToShow)) {
+                if(statInCollection(stat, statsToShow)) {
                     item {
                         Spacer(modifier = Modifier.height(5.dp))
                         StatCard(stat)
@@ -194,7 +192,7 @@ private fun LandscapeSuccessMenu(
             verticalArrangement = Arrangement.spacedBy((5).dp)
         ) {
             stats.forEach {stat ->
-                if(statInList(stat, statsToShow)) item {
+                if(statInCollection(stat, statsToShow)) item {
                     Spacer(modifier = Modifier.height(5.dp))
                     StatCard(stat)
                 }
