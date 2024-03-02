@@ -8,5 +8,7 @@ import com.example.nflstats.model.Team
 
 data class StatSettingsUIState(
     var playerSettingsList: List<Player>? = null,
-    var teamSettingsList: List<Team>? = null
+    var teamSettingsList: List<Team>? = null,
+    var statSuperSet: Map<Stat, Boolean> = emptyMap(),
+    var status: Status = Status.LOADING
 )

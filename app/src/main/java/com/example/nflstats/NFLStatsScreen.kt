@@ -59,7 +59,7 @@ fun NFLStatsScreen(
     statSettingsViewModel.build()
 
     val uiState by viewModel.uiState.collectAsState()
-    val statSettingsUIState = statSettingsViewModel.uiState.collectAsState()
+    val statSettingsUIState by statSettingsViewModel.uiState.collectAsState()
 
     NavHost(navController = navController, startDestination = Menus.MainMenu.name) {
         //The main menu
@@ -144,6 +144,7 @@ fun NFLStatsScreen(
         composable(route = Menus.StatViewMenu.name + "/{viewPlayer}",
             arguments = listOf(navArgument("viewPlayer") { type = NavType.BoolType })
         ) {
+            val viewPlayer = it.arguments?.getBoolean("viewPlayer") ?: false
             StatViewMenu(
                 uiState = uiState,
                 onGetPlayers = {
@@ -151,18 +152,10 @@ fun NFLStatsScreen(
                     navController.navigate(Menus.FromTeamPlayerSelectionMenu.name)
                 },
                 onAddEntity = {
-                    runBlocking {
-                        if(it is Team) {
-                            statSettingsViewModel.upsert(it)
-                            navController.navigate(Menus.StatSettingsChangeMenu.name + "/" + it.id + "/" + "false")
-                        }
-                        else if(it is Player) {
-                            statSettingsViewModel.upsertPlayer(it)
-                            navController.navigate(Menus.StatSettingsChangeMenu.name + "/" + it.id + "/" + "true")
-                        }
-                    }
+                    statSettingsViewModel.upsertEntity(it)
+                    navController.navigate(Menus.StatSettingsChangeMenu.name + "/" + it.id + "/" + viewPlayer.toString())
                 },
-                viewPlayer = it.arguments?.getBoolean("viewPlayer") ?: false
+                viewPlayer = viewPlayer
             )
         }
 
@@ -171,8 +164,14 @@ fun NFLStatsScreen(
             StatSettingsMenu(
                 toTeams = { navController.navigate(Menus.StatSettingsSelectionMenu.name + "/" + "false") },
                 toPlayers = { navController.navigate(Menus.StatSettingsSelectionMenu.name + "/" + "true") },
-                toGlobalPlayers = { navController.navigate(Menus.GlobalStatSettingsChangeMenu.name + "/" + "true")},
-                toGlobalTeams = { navController.navigate(Menus.GlobalStatSettingsChangeMenu.name + "/" + "false") }
+                toGlobalPlayers = {
+                    statSettingsViewModel.setStatSuperSet(true)
+                    navController.navigate(Menus.GlobalStatSettingsChangeMenu.name + "/" + "true")
+                                  },
+                toGlobalTeams = {
+                    statSettingsViewModel.setStatSuperSet(false)
+                    navController.navigate(Menus.GlobalStatSettingsChangeMenu.name + "/" + "false")
+                }
             )
         }
 
@@ -182,8 +181,8 @@ fun NFLStatsScreen(
         ) {
             SelectionMenu<Entity>(
                 entities = when (it.arguments?.getBoolean("forPlayer") ?: false) {
-                        true -> statSettingsUIState.value.playerSettingsList ?: emptyList()
-                        false -> statSettingsUIState.value.teamSettingsList ?: emptyList()
+                        true -> statSettingsUIState.playerSettingsList ?: emptyList()
+                        false -> statSettingsUIState.teamSettingsList ?: emptyList()
                     }.sortedBy { it.formattedName.first },
                 onCardClick = { entity ->
                     navController.navigate(Menus.StatSettingsChangeMenu.name + "/" + entity.id + "/" + "${entity is Player}")
@@ -214,7 +213,8 @@ fun NFLStatsScreen(
                             navController.navigateUp()
                             navController.navigateUp()
                         }
-                    }
+                    },
+                    status = statSettingsUIState.status
                 )
             }
         }
@@ -226,14 +226,15 @@ fun NFLStatsScreen(
         ) {
             val isPlayer = it.arguments?.getBoolean("isPlayer") ?: false
             StatsChangeMenu(
-                options = runBlocking { statSettingsViewModel.getStatSuperSet(isPlayer = isPlayer).associateWith { false } },
+                options = statSettingsUIState.statSuperSet,
                 onUpdate = {newStats ->
                     runBlocking {
                         statSettingsViewModel.setAllStats(newStats = newStats, forPlayer = isPlayer)
                         navController.navigateUp()
                         navController.navigateUp()
                     }
-                }
+                },
+                status = statSettingsUIState.status
             )
         }
     }

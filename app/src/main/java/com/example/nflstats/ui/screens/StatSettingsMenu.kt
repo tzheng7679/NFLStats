@@ -29,10 +29,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nflstats.R
+import com.example.nflstats.data.Status
 import com.example.nflstats.data.sampleStatOptions
 import com.example.nflstats.data.sortedCategories
 import com.example.nflstats.model.Stat
 import com.example.nflstats.ui.components.ActionButton
+import com.example.nflstats.ui.components.LoadingMenu
 
 @Composable
 fun StatSettingsMenu(toTeams: () -> Unit, toPlayers: () -> Unit, toGlobalTeams: () -> Unit, toGlobalPlayers: () -> Unit ,modifier: Modifier = Modifier) {
@@ -50,7 +52,15 @@ fun StatSettingsMenu(toTeams: () -> Unit, toPlayers: () -> Unit, toGlobalTeams: 
 }
 
 @Composable
-fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, modifier: Modifier = Modifier) {
+fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, status: Status, modifier: Modifier = Modifier) {
+    when(status) {
+        Status.SUCCESS -> SuccessStatsChangeMenu(options = options, onUpdate = onUpdate, modifier = modifier)
+        else -> LoadingMenu()
+    }
+}
+
+@Composable
+fun SuccessStatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, modifier: Modifier = Modifier) {
     //create an updated list and initialize it
     val updatedOptions = remember {
         mutableStateMapOf<Stat, Boolean>()
@@ -239,11 +249,11 @@ fun StatSettingsMenuPreview() {
 @Composable
 @Preview(showBackground = true)
 fun StatsChangeMenuPreview() {
-    StatsChangeMenu(sampleStatOptions, {})
+    StatsChangeMenu(sampleStatOptions, {}, Status.SUCCESS)
 }
 
 @Composable
 @Preview(device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape", showBackground = true)
 fun StatsChangeMenuPreviewHorizontal() {
-    StatsChangeMenu(sampleStatOptions, {})
+    StatsChangeMenu(sampleStatOptions, {}, Status.SUCCESS)
 }

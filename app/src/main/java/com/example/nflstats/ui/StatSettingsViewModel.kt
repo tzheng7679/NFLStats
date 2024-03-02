@@ -2,6 +2,8 @@ package com.example.nflstats.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.nflstats.data.Status
 import com.example.nflstats.data.database.PlayerRepo
 import com.example.nflstats.data.database.TeamRepo
 import com.example.nflstats.model.Entity
@@ -9,11 +11,13 @@ import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
 import com.example.nflstats.model.statInCollection
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -25,6 +29,17 @@ class StatSettingsViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StatSettingsUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun setStatus(status: Status) = _uiState.update { it.copy(status = status) }
+
+    fun upsertEntity(entity: Entity) {
+        viewModelScope.launch {
+            setStatus(Status.LOADING)
+            if(entity is Team) upsert(entity)
+            else if(entity is Player) upsertPlayer(entity)
+            setStatus(Status.SUCCESS)
+        }
+    }
 // *
 // *   Team methods
 // *
@@ -106,7 +121,8 @@ class StatSettingsViewModel(
     /**
      * Sets team or player (depends on [forPlayer]) of [Entity.id] [id] to have a sub set that reflects [newStats] (i.e. removes stats that aren't in [newStats])
      */
-    suspend fun setUpdatedEntity(newStats: Set<Stat>, id: Int, forPlayer: Boolean): Entity {
+    suspend fun setUpdatedEntity(newStats: Set<Stat>, id: Int, forPlayer: Boolean, setStatus: Boolean = false): Entity {
+        if(setStatus) setStatus(Status.LOADING)
         var subSet = mutableSetOf<Stat>()
         val entity = when(forPlayer) {
             true -> getPlayer(id)
@@ -122,6 +138,7 @@ class StatSettingsViewModel(
         if(newEntity is Player) upsertPlayer(newEntity)
         else if(newEntity is Team) upsert(newEntity)
 
+        if(setStatus) setStatus(Status.SUCCESS)
         return newEntity
     }
 
@@ -154,35 +171,42 @@ class StatSettingsViewModel(
     /**
      * Returns superset of all stats for either [Team] or [Player]; returns all the possible stats that exist for all of the players or teams in storage
      */
-    suspend fun getStatSuperSet(isPlayer: Boolean): Set<Stat> {
-        val superEntities = (if(isPlayer) getAllPlayers() else getAllTeams()).first() ?: emptyList()
+    fun setStatSuperSet(isPlayer: Boolean) {
+        setStatus(Status.LOADING)
+        viewModelScope.launch {
+            var superSet = mutableSetOf<Stat>()
+            val superEntities =
+                (if (isPlayer) getAllPlayers() else getAllTeams()).first() ?: emptyList()
 
-        //get all possible statistics for every entity desired
-        val allStats = mutableListOf<Stat>()
-        superEntities.forEach {entity ->
-            entity.possibleStats.forEach {
-                allStats.add(it)
+            //get all possible statistics for every entity desired
+            val allStats = mutableListOf<Stat>()
+            superEntities.forEach { entity ->
+                entity.possibleStats.forEach {
+                    allStats.add(it)
+                }
             }
-        }
 
-        //create a superset of unique stats
-        var superSet = mutableSetOf<Stat>()
-        allStats.forEach { stat ->
-            if(!statInCollection(stat, superSet)) superSet.add(stat)
+            //create a superset of unique stats
+            allStats.forEach { stat ->
+                if (!statInCollection(stat, superSet)) superSet.add(stat)
+            }
+            _uiState.update { it.copy(statSuperSet = superSet.associateWith { false }) }
+            setStatus(Status.SUCCESS)
         }
-
-        return superSet
     }
 
     /**
      * Sets all of the sub sets for all of either [Team] or [Player] in storage to the appropriate value for [newStats]
      */
     suspend fun setAllStats(newStats: Set<Stat>, forPlayer: Boolean) {
+        setStatus(Status.LOADING)
         (
             (if(forPlayer) getAllPlayers() else getAllTeams())
                 .first() ?: emptyList()
         ).forEach {entity ->
                         setUpdatedEntity(newStats = newStats, id = entity.id, forPlayer = forPlayer)
                     }
+
+        setStatus(Status.LOADING)
     }
 }
