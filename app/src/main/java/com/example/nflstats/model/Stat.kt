@@ -8,14 +8,6 @@ data class Stat(
     var value: String,
     val description: String,
     val category: String) {
-    init {
-        //add % sign to value if stat is a percentage stat
-        value += when {
-            name.contains("%") or name.contains(other = "percentage", ignoreCase = true) -> "%"
-            else -> ""
-        }
-    }
-
     /**
      * For our purposes, we only need to compare stats when we only desire they are describing the same thing, but not necessarily at the same time (basically they are the same stat, but not the same value)
      */

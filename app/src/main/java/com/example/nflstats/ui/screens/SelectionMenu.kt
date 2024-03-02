@@ -33,6 +33,7 @@ import com.example.nflstats.data.Teams
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Team
+import com.example.nflstats.ui.components.ActionButton
 import com.example.nflstats.ui.components.FailureMenu
 import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.imageCircle
@@ -72,7 +73,7 @@ fun <E> SuccessSelectionMenu(
                 Spacer(Modifier.height(8.dp))
             }
         }
-        if(onClear != null) item { FloatingActionButton(onClick = onClear, modifier = Modifier.fillMaxWidth().padding(15.dp)) { Text(text = "Clear all entities from storage") } }
+        if(onClear != null) item { ActionButton(onClick = onClear, padding = 15.0) { Text(text = "Clear all entities from storage") } }
     }
 }
 

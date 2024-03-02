@@ -39,10 +39,12 @@ enum class Menus(@StringRes val title : Int) {
     TeamSelectionMenu(R.string.team_selection_menu),
     FromMainPlayerSelectionMenu(R.string.from_main_player_selection_menu),
     FromTeamPlayerSelectionMenu(R.string.from_team_player_selection_menu),
+    SavedPlayersSelectionMenu(R.string.saved_players_selection_menu),
     StatViewMenu(R.string.stat_view_menu),
     StatSettingsEntry(R.string.stat_settings_menu_entry),
     StatSettingsSelectionMenu(R.string.stat_settings_menu),
-    StatSettingsChangeMenu(R.string.stat_settings_change_menu)
+    StatSettingsChangeMenu(R.string.stat_settings_change_menu),
+    GlobalStatSettingsChangeMenu(R.string.global_stat_settings_change_menu)
 }
 
 @RequiresApi(Build.VERSION_CODES.R)
@@ -63,9 +65,10 @@ fun NFLStatsScreen(
         //The main menu
         composable(route = Menus.MainMenu.name) {
             MainMenu(
-                { navController.navigate(Menus.TeamSelectionMenu.name) },
-                { navController.navigate(Menus.FromMainPlayerSelectionMenu.name) },
-                { navController.navigate(Menus.StatSettingsEntry.name) }
+                onTeamSelectionButton = { navController.navigate(Menus.TeamSelectionMenu.name) },
+                onPlayerSelectionButton = { navController.navigate(Menus.FromMainPlayerSelectionMenu.name) },
+                onSavedPlayerSelectionButton = { navController.navigate(Menus.SavedPlayersSelectionMenu.name) },
+                onChangeStatsButton = { navController.navigate(Menus.StatSettingsEntry.name) }
             )
         }
 
@@ -99,12 +102,26 @@ fun NFLStatsScreen(
         composable(route = Menus.FromTeamPlayerSelectionMenu.name) {
             SelectionMenu<Player>(
                 status = uiState.currPlayerListStatus,
-                entities = (uiState.currPlayerList?: emptyList()).sortedBy { it.formattedName.second },
-                onCardClick = {
-                    viewModel.setPlayer(player = it)
+                entities = runBlocking { statSettingsViewModel.getPlayersWithReplace(uiState.currPlayerList) }
+                    .sortedBy { it.formattedName.second },
+                onCardClick = { player ->
+                    viewModel.setPlayer(player = player)
                     navController.navigate(Menus.StatViewMenu.name + "/" + "true")
                 },
                 imageModifier = defaultPlayerImageModifier
+            )
+        }
+
+        composable(route = Menus.SavedPlayersSelectionMenu.name) {
+            SelectionMenu<Player>(
+                status = Status.SUCCESS,
+                entities = runBlocking { statSettingsViewModel.getAllPlayers().first() ?: emptyList() }
+                    .sortedBy { it.formattedName.second },
+                imageModifier = defaultPlayerImageModifier,
+                onCardClick = { player ->
+                    viewModel.setPlayer(player = player)
+                    navController.navigate(Menus.StatViewMenu.name + "/" + "true")
+                }
             )
         }
 
@@ -125,8 +142,7 @@ fun NFLStatsScreen(
         }
 
         //Route for going to see the statistics for a team (assumes that the stats have already been set)
-        composable(
-            route = Menus.StatViewMenu.name + "/{viewPlayer}",
+        composable(route = Menus.StatViewMenu.name + "/{viewPlayer}",
             arguments = listOf(navArgument("viewPlayer") { type = NavType.BoolType })
         ) {
             StatViewMenu(
@@ -151,15 +167,18 @@ fun NFLStatsScreen(
             )
         }
 
+        //Entry route for settings for entities
         composable(route = Menus.StatSettingsEntry.name) {
             StatSettingsMenu(
                 toTeams = { navController.navigate(Menus.StatSettingsSelectionMenu.name + "/" + "false") },
-                toPlayers = { navController.navigate(Menus.StatSettingsSelectionMenu.name + "/" + "true") }
+                toPlayers = { navController.navigate(Menus.StatSettingsSelectionMenu.name + "/" + "true") },
+                toGlobalPlayers = { navController.navigate(Menus.GlobalStatSettingsChangeMenu.name + "/" + "true")},
+                toGlobalTeams = { navController.navigate(Menus.GlobalStatSettingsChangeMenu.name + "/" + "false") }
             )
         }
 
-        composable(
-            route = Menus.StatSettingsSelectionMenu.name + "/{forPlayer}",
+        //Selection menu for choosing what entity to change settings for
+        composable(route = Menus.StatSettingsSelectionMenu.name + "/{forPlayer}",
             arguments = listOf(navArgument("forPlayer") { type = NavType.BoolType })
         ) {
             SelectionMenu<Entity>(
@@ -181,8 +200,8 @@ fun NFLStatsScreen(
             )
         }
 
-        composable(
-            route = Menus.StatSettingsChangeMenu.name + "/{id}/{isPlayer}",
+        //Menu for choosing what stats to deactivate (only for one entity)
+        composable(route = Menus.StatSettingsChangeMenu.name + "/{id}/{isPlayer}",
             arguments = listOf(navArgument("id") { type = NavType.IntType}, navArgument("isPlayer") {type = NavType.BoolType})
         ) {
             val isPlayer = it.arguments?.getBoolean("isPlayer") ?: false
@@ -199,6 +218,24 @@ fun NFLStatsScreen(
                     }
                 )
             }
+        }
+
+        //Menu for choosing what stats to deactivate (but for all teams if isPlayer and players otherwise)
+        composable(
+            route = Menus.GlobalStatSettingsChangeMenu.name + "/{isPlayer}",
+            arguments = listOf(navArgument("isPlayer") {type = NavType.BoolType})
+        ) {
+            val isPlayer = it.arguments?.getBoolean("isPlayer") ?: false
+            StatsChangeMenu(
+                options = runBlocking { statSettingsViewModel.getStatSuperSet(isPlayer = isPlayer).associateWith { false } },
+                onUpdate = {newStats ->
+                    runBlocking {
+                        statSettingsViewModel.setAllStats(newStats = newStats, forPlayer = isPlayer)
+                        navController.navigateUp()
+                        navController.navigateUp()
+                    }
+                }
+            )
         }
     }
 }

@@ -8,6 +8,7 @@ import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
+import com.example.nflstats.model.statInList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -88,6 +89,9 @@ class StatSettingsViewModel(
         getAllTeams()
     }
 
+    /**
+     * Returns map of possible stats and whether or not to show them for [Entity] of id [id]
+     */
     suspend fun getStatsShowMap(id: Int, forPlayer: Boolean): Map<Stat, Boolean> {
         val entity = when(forPlayer) {
             true -> getPlayer(id)
@@ -99,6 +103,9 @@ class StatSettingsViewModel(
         return entity?.possibleStats?.associateWith { it in statsTrue } ?: emptyMap()
     }
 
+    /**
+     * Sets team or player (depends on [forPlayer]) of [Entity.id] [id] to have a sub set that reflects [newStats] (i.e. removes stats that aren't in [newStats])
+     */
     suspend fun setUpdatedEntity(newStats: Set<Stat>, id: Int, forPlayer: Boolean): Entity {
         var subSet = mutableSetOf<Stat>()
         val entity = when(forPlayer) {
@@ -107,7 +114,8 @@ class StatSettingsViewModel(
         }.first()!!
 
         entity.possibleStats.forEach {prevStat ->
-            if(prevStat !in newStats) subSet.add(prevStat)
+            //Construct the subset for the entity
+            if(!statInList(prevStat, newStats)) subSet.add(prevStat)
         }
         val newEntity = entity.apply { uniqueSubs = subSet }
 
@@ -115,5 +123,59 @@ class StatSettingsViewModel(
         else if(newEntity is Team) upsert(newEntity)
 
         return newEntity
+    }
+
+    /**
+     * Returns list of a team's players, with the player replaced if already in storage with the stored version
+     */
+    suspend fun getPlayersWithReplace(fetchedPlayers: List<Player>?): List<Player> {
+        Log.d("HelpMe", "________")
+        Log.d("HelpMe", fetchedPlayers.toString())
+        val allPlayers = getAllPlayers().first() ?: emptyList()
+
+        val newPlayers = mutableListOf<Player>()
+        (fetchedPlayers ?: emptyList()).forEach {fetchedPlayer ->
+            var inStorage: Player? = null
+            for(storedPlayer in allPlayers) {
+                if(storedPlayer.id == fetchedPlayer.id) {
+                    inStorage = storedPlayer
+                    break
+                }
+            }
+
+            if(inStorage != null) newPlayers.add(inStorage) else newPlayers.add(fetchedPlayer)
+        }
+
+        Log.d("HelpMe", newPlayers.toString())
+        Log.d("HelpMe", "________")
+        return newPlayers
+    }
+
+    /**
+     * Returns superset of all stats for either [Team] or [Player]; returns all the possible stats that exist for all of the players or teams in storage
+     */
+    suspend fun getStatSuperSet(isPlayer: Boolean): Set<Stat> {
+        val superEntities = (if(isPlayer) getAllPlayers() else getAllTeams()).first() ?: emptyList()
+        var superSet = mutableSetOf<Stat>()
+
+        superEntities.forEach {
+            it.possibleStats.forEach { stat ->
+                superSet.add(stat)
+            }
+        }
+
+        return superSet
+    }
+
+    /**
+     * Sets all of the sub sets for all of either [Team] or [Player] in storage to the appropriate value for [newStats]
+     */
+    suspend fun setAllStats(newStats: Set<Stat>, forPlayer: Boolean) {
+        (
+            (if(forPlayer) getAllPlayers() else getAllTeams())
+                .first() ?: emptyList()
+        ).forEach {entity ->
+                        setUpdatedEntity(newStats = newStats, id = entity.id, forPlayer = forPlayer)
+                    }
     }
 }

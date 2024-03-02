@@ -34,7 +34,6 @@ fun OnAddEntityButton(entity: Entity, onAddEntity: (Entity) -> Unit) {
             color = Color(255,255,255),
             onTextLayout = {it ->
                 if(it.didOverflowWidth || it.didOverflowWidth) {
-                    Log.d("HelpMe", "Adjusting...")
                     adjustedFontSize *= .5
                 }
             }

@@ -16,7 +16,6 @@ data class Team(
     val abbr: Teams,
     @PrimaryKey override val id: Int = abbrToID[abbr] ?: 1,
     override val imageID: Int = teamImageMap[abbr] ?: 0,
-    override var uniqueAdds : MutableSet<Stat> = mutableSetOf<Stat>(),
     override var uniqueSubs: MutableSet<Stat> = mutableSetOf<Stat>(),
     override var possibleStats: List<Stat> = globalStats
 ) : Entity() {
@@ -41,13 +40,6 @@ data class Team(
         throw NotImplementedError()
     }
 
-    override fun getStatsToShow(): Set<Stat> {
-        Log.d("HelpMe", possibleStats.toString())
-        Log.d("HelpMe", uniqueAdds.toString())
-        Log.d("HelpMe", uniqueSubs.toString())
-        Log.d("HelpMe", (possibleStats union uniqueAdds subtract uniqueSubs).toString())
-        return possibleStats union uniqueAdds subtract uniqueSubs
-    }
     /**
      * Returns divisional place in format "{Place} in {Division}"
      */

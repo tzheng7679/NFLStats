@@ -80,6 +80,8 @@ val teamImageMap: Map<Teams, Int> = mapOf(
     Teams.WSH to R.drawable.was
 )
 
+val imageIdToAbbrMap = teamImageMap.map{ (k,v) -> v to k }.toMap()
+
 //maps teams to full names
 val teamNameMap: Map<Teams, String> = mapOf(
     Teams.ARI to "Arizona Cardinals",
@@ -192,6 +194,21 @@ val sampleStatOptions = mapOf(
     ssg("Passing Yards", "Passing"),
     ssg("Rushing yards", "Rushing"),
 )
+
+val sortedCategories = mapOf(
+    "Scoring" to 1,
+    "Passing" to 2,
+    "Receiving" to 3,
+    "Rushing" to 4,
+    "Defensive" to 5,
+    "Defensive Interceptions" to 6,
+    "Punting" to 7,
+    "Kicking" to 8,
+    "Returning" to 9,
+    "General" to 10,
+    "Miscellaneous" to 11,
+)
+
 fun ssg(name: String, category: String, activated: Boolean = false): Pair<Stat, Boolean> {
     return Stat(name, "", "", category) to activated
 }

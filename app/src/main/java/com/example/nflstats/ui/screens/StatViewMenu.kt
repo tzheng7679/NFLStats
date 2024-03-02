@@ -3,6 +3,7 @@
 package com.example.nflstats.ui.screens
 
 import android.content.res.Configuration
+import androidx.compose.ui.graphics.Color
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.em
 import com.example.nflstats.data.Status
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.idToAbbr
+import com.example.nflstats.data.imageIdToAbbrMap
 import com.example.nflstats.data.sampleStats
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.model.Entity
@@ -54,6 +56,7 @@ import com.example.nflstats.ui.components.GetPlayersButton
 import com.example.nflstats.ui.components.LoadingMenu
 import com.example.nflstats.ui.components.OnAddEntityButton
 import com.example.nflstats.ui.components.imageCircle
+import com.example.nflstats.ui.theme.ColorTypes
 import com.example.nflstats.ui.theme.StatViewTheme
 import com.example.nflstats.ui.theme.defaultCardModifier
 import com.example.nflstats.ui.theme.defaultDescriptionModifier
@@ -73,10 +76,6 @@ fun StatViewMenu(
     onAddEntity: (Entity) -> Unit,
     viewPlayer: Boolean = false
 ) {
-    Log.d("HelpMe", "-------------")
-    Log.d("HelpMe", idToAbbr[uiState.currTeam!!.id].toString())
-    Log.d("HelpMe", "-------------")
-
     StatViewTheme(
         teamColorMap[idToAbbr[uiState.currTeam!!.id]]!!
     ) {
@@ -158,9 +157,7 @@ private fun PortraitSuccessMenu(
             modifier = Modifier.padding(it),
             verticalArrangement = Arrangement.spacedBy((5).dp)
         ) {
-            Log.d("HelpMe", entity.possibleStats.toString())
             stats.forEach {stat ->
-                Log.d("HelpMe", stat.toString())
                 if(statInList(stat, statsToShow)) {
                     item {
                         Spacer(modifier = Modifier.height(5.dp))
@@ -249,7 +246,12 @@ fun StatCard(stat: Stat) {
                 ) {
                     //Stat value
                     Text(
-                        text = stat.value,
+                        text = stat.value + when(
+                            stat.name.contains("%") or stat.name.contains(other = "percentage", ignoreCase = true)
+                        ) {
+                            true -> "%"
+                            false -> ""
+                        },
                         textAlign = TextAlign.Right,
                         fontSize = 12.em,
                         fontWeight = FontWeight.ExtraBold,

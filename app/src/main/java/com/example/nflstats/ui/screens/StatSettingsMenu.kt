@@ -6,13 +6,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
@@ -20,15 +23,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nflstats.data.sampleStatOptions
+import com.example.nflstats.data.sortedCategories
 import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
+import com.example.nflstats.ui.components.ActionButton
 
 @Composable
-fun StatSettingsMenu(toTeams: () -> Unit, toPlayers: () -> Unit, modifier: Modifier = Modifier) {
+fun StatSettingsMenu(toTeams: () -> Unit, toPlayers: () -> Unit, toGlobalTeams: () -> Unit, toGlobalPlayers: () -> Unit ,modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -43,6 +49,14 @@ fun StatSettingsMenu(toTeams: () -> Unit, toPlayers: () -> Unit, modifier: Modif
         Button(onClick = toPlayers) {
             Text("Change stats for a single player")
         }
+
+        Button(onClick = toGlobalTeams) {
+            Text("Change stats for global teams")
+        }
+
+        Button(onClick = toGlobalPlayers) {
+            Text("Change stats for global players")
+        }
     }
 }
 
@@ -52,56 +66,46 @@ fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, 
     val updatedOptions = remember {
         mutableStateMapOf<Stat, Boolean>()
     }
+
+    /**
+     * Settings in alphabetical order
+     */
+    val orderedOptions = options.keys.sortedBy{
+        it.name
+    }.sortedBy {
+        sortedCategories[it.category] ?: 12
+    }
+
     options.forEach {
         updatedOptions[it.key] = it.value
     }
     Column(verticalArrangement = Arrangement.Bottom , horizontalAlignment = Alignment.CenterHorizontally) {
         //Column of options
-        FloatingActionButton(
+        ActionButton(
             onClick = {
                 val optionsOut = updatedOptions.filter { it.value }.keys
                 onUpdate(optionsOut)
-            },
-            modifier = Modifier.fillMaxWidth()
+            }
         ) {
             Text("Update")
         }
         //Select all
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = {
-                    updatedOptions.forEach { updatedOptions[it.key] = true}
-                })
-                .border(
-                    width = .5.dp,
-                    color = Color.Gray
-                )
-                .padding(5.dp)
+        ActionButton(
+            onClick = { updatedOptions.forEach { updatedOptions[it.key] = true} }
         ) {
             Text(text = "Select all")
         }
         //Deselect all
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = {
-                    updatedOptions.forEach { updatedOptions[it.key] = false}
-                })
-                .border(
-                    width = .5.dp,
-                    color = Color.Gray
-                )
-                .padding(5.dp)
+        ActionButton(
+            onClick = { updatedOptions.forEach { updatedOptions[it.key] = false }}
         ) {
             Text(text = "Deselect all")
         }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
         LazyColumn {
-            updatedOptions.forEach { entry ->
+            orderedOptions.forEach { key ->
                 item {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -109,7 +113,7 @@ fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, 
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(onClick = {
-                                updatedOptions[entry.key] = !entry.value
+                                updatedOptions[key] = !(updatedOptions[key]!!)
                             })
                             .border(
                                 width = .5.dp,
@@ -119,16 +123,24 @@ fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, 
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(
-                                checked = entry.value,
-                                onCheckedChange = { updatedOptions[entry.key] = !entry.value }
+                                checked = updatedOptions[key]!!,
+                                onCheckedChange = { updatedOptions[key] = !updatedOptions[key]!! }
                             )
+
+                            val newLinePosPos = key.name.indexOf(" ", 15)
                             Text(
-                                text = entry.key.name
+//                                text = entry.key.name,
+                                text = when(newLinePosPos) {
+                                    -1 -> key.name
+                                    else -> key.name.replaceRange(newLinePosPos..newLinePosPos, "\n")
+                                }
                             )
                         }
 
                         Text(
-                            text = entry.key.category
+                            text = key.category.replace(" ", "\n"),
+                            textAlign = TextAlign.Right,
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 }
@@ -139,7 +151,7 @@ fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, 
 @Composable
 @Preview(showBackground = true)
 fun StatSettingsMenuPreview() {
-    StatSettingsMenu({}, {})
+    StatSettingsMenu({}, {}, {}, {})
 }
 
 @Composable

@@ -9,7 +9,6 @@ abstract class Entity() {
     //Have globalStats as the java equivalent of a static variable
     abstract val id : Int
 
-    abstract var uniqueAdds: MutableSet<Stat>
     abstract var uniqueSubs : MutableSet<Stat>
     abstract val formattedName : Pair<String, String>
     abstract val imageID : Int
@@ -53,11 +52,7 @@ abstract class Entity() {
      * Returns Set of string name for stats for this object
      */
     open fun getStatsToShow(): Set<Stat> {
-        Log.d("HelpMe", possibleStats.toString())
-        Log.d("HelpMe", uniqueAdds.toString())
-        Log.d("HelpMe", uniqueSubs.toString())
-        Log.d("HelpMe", (possibleStats union uniqueAdds subtract uniqueSubs).toString())
-        return possibleStats union uniqueAdds subtract uniqueSubs
+        return possibleStats subtract uniqueSubs
     }
 
     abstract fun getURLAddition() : String

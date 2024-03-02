@@ -11,9 +11,8 @@ data class Player(
     val lName: String,
     @PrimaryKey override val id: Int,
     override val imageID: Int,
-    override var uniqueAdds : MutableSet<Stat> = mutableSetOf<Stat>(),
     override var uniqueSubs : MutableSet<Stat> = mutableSetOf<Stat>(),
-    override var possibleStats: List<Stat> = globalStats
+    override var possibleStats: List<Stat> = globalStats,
 ) : Entity() {
 
     override val formattedName: Pair<String, String>

@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.nflstats.R
 
 @Composable
-fun MainMenu(onTeamSelectionButton : () -> Unit, onPlayerSelectionButton : () -> Unit, onChangeStatsButton : () -> Unit, modifier : Modifier = Modifier) {
+fun MainMenu(onTeamSelectionButton : () -> Unit, onPlayerSelectionButton : () -> Unit, onSavedPlayerSelectionButton: () -> Unit, onChangeStatsButton : () -> Unit, modifier : Modifier = Modifier) {
     Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally) {
         Button(onClick = onTeamSelectionButton) {
             Text(stringResource(R.string.view_stats_for_a_team))
@@ -20,6 +20,10 @@ fun MainMenu(onTeamSelectionButton : () -> Unit, onPlayerSelectionButton : () ->
 
         Button(onClick = onPlayerSelectionButton) {
             Text(stringResource(R.string.view_stats_for_a_player))
+        }
+
+        Button(onClick = onSavedPlayerSelectionButton) {
+            Text(stringResource(R.string.view_stats_for_a_saved_player))
         }
 
         Button(onClick = onChangeStatsButton) {
@@ -31,5 +35,5 @@ fun MainMenu(onTeamSelectionButton : () -> Unit, onPlayerSelectionButton : () ->
 @Composable
 @Preview
 fun MainMenuPreview() {
-    MainMenu({}, {}, {})
+    MainMenu({}, {}, {}, {})
 }
