@@ -1,6 +1,5 @@
 package com.example.nflstats.model
 
-import android.util.Log
 import androidx.room.Entity
 import java.util.Calendar
 

@@ -1,7 +1,6 @@
 package com.example.nflstats.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.FloatingActionButton

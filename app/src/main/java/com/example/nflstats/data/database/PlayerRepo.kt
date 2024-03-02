@@ -1,5 +1,4 @@
 package com.example.nflstats.data.database
-import androidx.room.Query
 import com.example.nflstats.model.Player
 import kotlinx.coroutines.flow.Flow
 

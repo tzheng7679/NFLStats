@@ -1,9 +1,7 @@
 package com.example.nflstats.model
-import android.util.Log
 import androidx.room.PrimaryKey
 import com.example.nflstats.data.Teams
 import com.example.nflstats.data.abbrToID
-import com.example.nflstats.data.database.Converters
 import com.example.nflstats.data.globalStats
 import com.example.nflstats.data.teamImageMap
 import com.example.nflstats.data.teamNameMap

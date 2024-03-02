@@ -4,10 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.example.nflstats.model.Team
 import com.example.nflstats.model.Player
+import com.example.nflstats.model.Team
 
 @Database(entities = [Player::class, Team::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)

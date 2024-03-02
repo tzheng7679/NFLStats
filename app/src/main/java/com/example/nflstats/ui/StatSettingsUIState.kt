@@ -1,7 +1,6 @@
 package com.example.nflstats.ui
 
 import com.example.nflstats.data.Status
-import com.example.nflstats.model.Entity
 import com.example.nflstats.model.Player
 import com.example.nflstats.model.Stat
 import com.example.nflstats.model.Team
