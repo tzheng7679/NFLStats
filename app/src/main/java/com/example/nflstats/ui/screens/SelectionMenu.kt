@@ -68,7 +68,7 @@ fun <E> SuccessSelectionMenu(
     onClear: (() -> Unit)?,
     cardModifier: Modifier
 ) {
-    LazyColumn {
+    LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
         entities.forEach {
             item {
                 Row(modifier = Modifier.padding(3.dp)) {
@@ -77,7 +77,7 @@ fun <E> SuccessSelectionMenu(
                 Spacer(Modifier.height(8.dp))
             }
         }
-        if(onClear != null) item { ActionButton(onClick = onClear, padding = 15.0) { Text(text = "Clear all entities from storage") } }
+        if(onClear != null) item { ActionButton(onClick = onClear, padding = 15.0, isSelectionMenu = true) { Text(text = "Clear all entities from storage", textAlign = TextAlign.Center) } }
     }
 }
 

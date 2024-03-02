@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 package com.example.nflstats.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -76,72 +78,165 @@ fun StatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) -> Unit, 
     options.forEach {
         updatedOptions[it.key] = it.value
     }
-    Column(verticalArrangement = Arrangement.Bottom , horizontalAlignment = Alignment.CenterHorizontally) {
-        //Column of options
-        ActionButton(
-            onClick = {
-                val optionsOut = updatedOptions.filter { it.value }.keys
-                onUpdate(optionsOut)
+
+    if(LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            //Column of options
+            ButtonSet(
+                onUpdate = {
+                    val optionsOut = updatedOptions.filter { it.value }.keys
+                    onUpdate(optionsOut)
+                },
+                onSelectAll = {
+                    updatedOptions.forEach { updatedOptions[it.key] = true }
+                },
+                onDeselectAll = {
+                    updatedOptions.forEach { updatedOptions[it.key] = false }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            LazyColumn {
+                orderedOptions.forEach { key ->
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = {
+                                    updatedOptions[key] = !(updatedOptions[key]!!)
+                                })
+                                .border(
+                                    width = .5.dp,
+                                    color = Color.Gray
+                                )
+                                .padding(5.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = updatedOptions[key]!!,
+                                    onCheckedChange = {
+                                        updatedOptions[key] = !updatedOptions[key]!!
+                                    }
+                                )
+
+                                val newLinePosPos = key.name.indexOf(" ", 15)
+                                Text(
+//                                text = entry.key.name,
+                                    text = when (newLinePosPos) {
+                                        -1 -> key.name
+                                        else -> key.name.replaceRange(
+                                            newLinePosPos..newLinePosPos,
+                                            "\n"
+                                        )
+                                    }
+                                )
+                            }
+
+                            Text(
+                                text = key.category.replace(" ", "\n"),
+                                textAlign = TextAlign.Right,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    else {
+        Row( verticalAlignment = Alignment.CenterVertically) {
+            ButtonSet(
+                onUpdate = {
+                    val optionsOut = updatedOptions.filter { it.value }.keys
+                    onUpdate(optionsOut)
+                },
+                onSelectAll = {
+                    updatedOptions.forEach { updatedOptions[it.key] = true }
+                },
+                onDeselectAll = {
+                    updatedOptions.forEach { updatedOptions[it.key] = false }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            LazyColumn {
+                orderedOptions.forEach { key ->
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = {
+                                    updatedOptions[key] = !(updatedOptions[key]!!)
+                                })
+                                .border(
+                                    width = .5.dp,
+                                    color = Color.Gray
+                                )
+                                .padding(5.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = updatedOptions[key]!!,
+                                    onCheckedChange = {
+                                        updatedOptions[key] = !updatedOptions[key]!!
+                                    }
+                                )
+
+                                val newLinePosPos = key.name.indexOf(" ", 15)
+                                Text(
+//                                text = entry.key.name,
+                                    text = when (newLinePosPos) {
+                                        -1 -> key.name
+                                        else -> key.name.replaceRange(
+                                            newLinePosPos..newLinePosPos,
+                                            "\n"
+                                        )
+                                    }
+                                )
+                            }
+
+                            Text(
+                                text = key.category.replace(" ", "\n"),
+                                textAlign = TextAlign.Right,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ButtonSet(onUpdate: () -> Unit, onSelectAll: () -> Unit, onDeselectAll: () -> Unit) {
+    Column {
+        ActionButton(
+            onClick = onUpdate
         ) {
             Text("Update")
         }
         //Select all
         ActionButton(
-            onClick = { updatedOptions.forEach { updatedOptions[it.key] = true} }
+            onClick = onSelectAll
         ) {
             Text(text = "Select all")
         }
         //Deselect all
         ActionButton(
-            onClick = { updatedOptions.forEach { updatedOptions[it.key] = false }}
+            onClick = onDeselectAll
         ) {
             Text(text = "Deselect all")
-        }
-
-        Spacer(modifier = Modifier.height(5.dp))
-
-        LazyColumn {
-            orderedOptions.forEach { key ->
-                item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(onClick = {
-                                updatedOptions[key] = !(updatedOptions[key]!!)
-                            })
-                            .border(
-                                width = .5.dp,
-                                color = Color.Gray
-                            )
-                            .padding(5.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(
-                                checked = updatedOptions[key]!!,
-                                onCheckedChange = { updatedOptions[key] = !updatedOptions[key]!! }
-                            )
-
-                            val newLinePosPos = key.name.indexOf(" ", 15)
-                            Text(
-//                                text = entry.key.name,
-                                text = when(newLinePosPos) {
-                                    -1 -> key.name
-                                    else -> key.name.replaceRange(newLinePosPos..newLinePosPos, "\n")
-                                }
-                            )
-                        }
-
-                        Text(
-                            text = key.category.replace(" ", "\n"),
-                            textAlign = TextAlign.Right,
-                            color = MaterialTheme.colorScheme.tertiary
-                        )
-                    }
-                }
-            }
         }
     }
 }
@@ -154,5 +249,11 @@ fun StatSettingsMenuPreview() {
 @Composable
 @Preview(showBackground = true)
 fun StatsChangeMenuPreview() {
+    StatsChangeMenu(sampleStatOptions, {})
+}
+
+@Composable
+@Preview(device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape", showBackground = true)
+fun StatsChangeMenuPreviewHorizontal() {
     StatsChangeMenu(sampleStatOptions, {})
 }
