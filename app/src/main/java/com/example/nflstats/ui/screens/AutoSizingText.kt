@@ -22,7 +22,8 @@ fun AutosizedText(
     textAlign: TextAlign = TextAlign.Left,
     fontWeight: FontWeight = FontWeight.Normal,
     fontStyle: FontStyle = FontStyle.Normal,
-    fontFamily: FontFamily = FontFamily.Default
+    fontFamily: FontFamily = FontFamily.Default,
+    maxLines: Int = 1
 ) {
     val textSize = remember { mutableStateOf(baseSize) }
 
@@ -33,7 +34,7 @@ fun AutosizedText(
         fontSize = textSize.value, //size of font for team names
         fontWeight = fontWeight,
         fontStyle = fontStyle,
-        maxLines = 1,
+        maxLines = maxLines,
         color = color,
         overflow = TextOverflow.Ellipsis,
         onTextLayout = {

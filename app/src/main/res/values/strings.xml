@@ -3,9 +3,9 @@
     <string name="main_menu">Main Menu</string>
     <string name="team_selection_menu">Team Selection Menu</string>
     <string name="player_selection_menu">Player Selection Menu</string>
-    <string name="view_stats_for_a_team">View Stats for a Team</string>
-    <string name="change_statistics_shown">Change statistics shown</string>
-    <string name="view_stats_for_a_player">View Stats for a player\n(from team)</string>
+    <string name="view_stats_for_a_team">View Team Statistics</string>
+    <string name="change_statistics_shown">Team/Player Settings</string>
+    <string name="view_stats_for_a_player">View Player Statistics By Team</string>
     <string name="stat_view_menu">Stat View Menu</string>
     <string name="from_main_player_selection_menu">From Main Player Selection Menu</string>
     <string name="from_team_player_selection_menu">From Team Player Selection Menu</string>
@@ -17,5 +17,9 @@
     <string name="true_string">true\n</string>
     <string name="global_stat_settings_change_menu">Global Stat Settings Change Menu</string>
     <string name="saved_players_selection_menu">Saved Players Selection Menu</string>
-    <string name="view_stats_for_a_saved_player">View Stats For a Saved Player</string>
+    <string name="view_stats_for_a_saved_player">View Statistics For a Saved Player</string>
+    <string name="change_stats_for_a_single_team">View/Change Stats For Saved Teams</string>
+    <string name="change_stats_for_a_single_player">View/Change Stats For Saved Players</string>
+    <string name="change_stats_for_global_teams">Change Stats For All Saved Teams</string>
+    <string name="change_stats_for_global_players">Change Stats For All Saved Players</string>
 </resources>

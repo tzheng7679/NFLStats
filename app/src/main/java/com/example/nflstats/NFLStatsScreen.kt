@@ -67,9 +67,8 @@ fun NFLStatsScreen(
             MainMenu(
                 onTeamSelectionButton = { navController.navigate(Menus.TeamSelectionMenu.name) },
                 onPlayerSelectionButton = { navController.navigate(Menus.FromMainPlayerSelectionMenu.name) },
-                onSavedPlayerSelectionButton = { navController.navigate(Menus.SavedPlayersSelectionMenu.name) },
-                onChangeStatsButton = { navController.navigate(Menus.StatSettingsEntry.name) }
-            )
+                onSavedPlayerSelectionButton = { navController.navigate(Menus.SavedPlayersSelectionMenu.name) }
+            ) { navController.navigate(Menus.StatSettingsEntry.name) }
         }
 
         //Route for going to the menu to select a team, and then to StatViewMenu upon selection of team

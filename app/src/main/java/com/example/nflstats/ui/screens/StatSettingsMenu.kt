@@ -24,9 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.nflstats.R
 import com.example.nflstats.data.sampleStatOptions
 import com.example.nflstats.data.sortedCategories
 import com.example.nflstats.model.Stat
@@ -34,28 +36,16 @@ import com.example.nflstats.ui.components.ActionButton
 
 @Composable
 fun StatSettingsMenu(toTeams: () -> Unit, toPlayers: () -> Unit, toGlobalTeams: () -> Unit, toGlobalPlayers: () -> Unit ,modifier: Modifier = Modifier) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
+    Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally) {
         //Route for changing a team
-        Button(onClick = toTeams) {
-            Text("Change stats for a single team")
-        }
+        MainMenuButton(onClick = toTeams, stringId = R.string.change_stats_for_a_single_team, imageId = R.drawable.groups_foreground)
 
         //Route for changing a player
-        Button(onClick = toPlayers) {
-            Text("Change stats for a single player")
-        }
+        MainMenuButton(onClick = toPlayers, stringId = R.string.change_stats_for_a_single_player, imageId = R.drawable.player_icon_foreground)
 
-        Button(onClick = toGlobalTeams) {
-            Text("Change stats for global teams")
-        }
+        MainMenuButton(onClick = toGlobalTeams, stringId = R.string.change_stats_for_global_teams, imageId = R.drawable.groups_foreground, backgroundImageId = R.drawable.global_foreground)
 
-        Button(onClick = toGlobalPlayers) {
-            Text("Change stats for global players")
-        }
+        MainMenuButton(onClick = toGlobalPlayers, stringId = R.string.change_stats_for_global_players, imageId = R.drawable.player_icon_foreground, backgroundImageId = R.drawable.global_foreground)
     }
 }
 
