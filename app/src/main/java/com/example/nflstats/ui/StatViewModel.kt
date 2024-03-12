@@ -143,7 +143,7 @@ class StatViewModel : ViewModel() {
                                 lName = resultPlayerInfo.lastName,
                                 id = resultPlayerInfo.id.toInt(),
                                 imageID = team.imageID,
-                                team = _uiState.value.currTeam?.abbr ?: Teams.DET
+                                team = _uiState.value.currTeam?.abbr ?: Teams.WSH
                             )
                         )
                     }

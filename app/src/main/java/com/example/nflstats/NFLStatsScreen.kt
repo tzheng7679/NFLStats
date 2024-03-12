@@ -73,12 +73,7 @@ fun NFLStatsScreen(
 
         //Route for going to the menu to select a team, and then to StatViewMenu upon selection of team
         composable(route = Menus.TeamSelectionMenu.name) {
-            //! IMPORTANT *******************
-            //! NOTE: CHANGE OPTIONS LATER SO IT USES SYSTEM STORED OBJECTS, NOT NEWLY CREATED ONES
-            //! IMPORTANT *******************
-            //! val options = Teams.entries.map { Team(it) }
             SelectionMenu<Team>(
-                //can assume that teams will be succesfuly created
                 status = Status.SUCCESS,
                 entities = runBlocking {
                     val storedTeams = (statSettingsViewModel.getAllTeams().first() ?: emptyList()).toMutableList()
@@ -89,7 +84,6 @@ fun NFLStatsScreen(
                     storedTeams
                }.sortedBy { it.formattedName.first },
                 onCardClick = { team ->
-                    val x = uiState.currTeamStats
                     viewModel.setTeam(team)
                     navController.navigate(Menus.StatViewMenu.name + "/" + "false")
                               },
@@ -179,8 +173,9 @@ fun NFLStatsScreen(
         composable(route = Menus.StatSettingsSelectionMenu.name + "/{forPlayer}",
             arguments = listOf(navArgument("forPlayer") { type = NavType.BoolType })
         ) {
+            val forPlayer = it.arguments?.getBoolean("forPlayer") ?: false
             SelectionMenu<Entity>(
-                entities = when (it.arguments?.getBoolean("forPlayer") ?: false) {
+                entities = when (forPlayer) {
                         true -> statSettingsUIState.playerSettingsList ?: emptyList()
                         false -> statSettingsUIState.teamSettingsList ?: emptyList()
                     }.sortedBy { it.formattedName.first },

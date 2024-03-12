@@ -5,13 +5,11 @@ import java.util.Calendar
 
 @Entity
 abstract class Entity() {
-    //Have globalStats as the java equivalent of a static variable
     abstract val id : Int
 
     abstract var uniqueSubs : MutableSet<Stat>
     abstract val formattedName : Pair<String, String>
     abstract val imageID : Int
-    var secondaryInformation : String = "FILLER"
     abstract var possibleStats: List<Stat>
     //base string for ESPN URL and a method to return the appropriate season
     companion object {

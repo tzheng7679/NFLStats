@@ -73,146 +73,87 @@ fun SuccessStatsChangeMenu(options: Map<Stat, Boolean>, onUpdate: (Set<Stat>) ->
         sortedCategories[it.category] ?: 12
     }
 
+    //initialize [updatedOptions]
     options.forEach {
         updatedOptions[it.key] = it.value
+    }
+
+    /**
+     * Shared content between the portrait and landscape configurations
+     */
+    val content = @Composable {
+        ButtonSet(
+            onUpdate = {
+                val optionsOut = updatedOptions.filter { it.value }.keys
+                onUpdate(optionsOut)
+            },
+            onSelectAll = {
+                updatedOptions.forEach { updatedOptions[it.key] = true }
+            },
+            onDeselectAll = {
+                updatedOptions.forEach { updatedOptions[it.key] = false }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        LazyColumn {
+            orderedOptions.forEach { key ->
+                item {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = {
+                                updatedOptions[key] = !(updatedOptions[key]!!)
+                            })
+                            .border(
+                                width = .5.dp,
+                                color = Color.Gray
+                            )
+                            .padding(5.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = updatedOptions[key]!!,
+                                onCheckedChange = {
+                                    updatedOptions[key] = !updatedOptions[key]!!
+                                }
+                            )
+
+                            val newLinePosPos = key.name.indexOf(" ", 15)
+                            Text(
+                                text = when (newLinePosPos) {
+                                    -1 -> key.name
+                                    else -> key.name.replaceRange(
+                                        newLinePosPos..newLinePosPos,
+                                        "\n"
+                                    )
+                                }
+                            )
+                        }
+
+                        Text(
+                            text = key.category.replace(" ", "\n"),
+                            textAlign = TextAlign.Right,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                }
+            }
+        }
     }
 
     if(LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
         Column(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            //Column of options
-            ButtonSet(
-                onUpdate = {
-                    val optionsOut = updatedOptions.filter { it.value }.keys
-                    onUpdate(optionsOut)
-                },
-                onSelectAll = {
-                    updatedOptions.forEach { updatedOptions[it.key] = true }
-                },
-                onDeselectAll = {
-                    updatedOptions.forEach { updatedOptions[it.key] = false }
-                }
-            )
-
-            Spacer(modifier = Modifier.height(5.dp))
-
-            LazyColumn {
-                orderedOptions.forEach { key ->
-                    item {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable(onClick = {
-                                    updatedOptions[key] = !(updatedOptions[key]!!)
-                                })
-                                .border(
-                                    width = .5.dp,
-                                    color = Color.Gray
-                                )
-                                .padding(5.dp)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = updatedOptions[key]!!,
-                                    onCheckedChange = {
-                                        updatedOptions[key] = !updatedOptions[key]!!
-                                    }
-                                )
-
-                                val newLinePosPos = key.name.indexOf(" ", 15)
-                                Text(
-//                                text = entry.key.name,
-                                    text = when (newLinePosPos) {
-                                        -1 -> key.name
-                                        else -> key.name.replaceRange(
-                                            newLinePosPos..newLinePosPos,
-                                            "\n"
-                                        )
-                                    }
-                                )
-                            }
-
-                            Text(
-                                text = key.category.replace(" ", "\n"),
-                                textAlign = TextAlign.Right,
-                                color = MaterialTheme.colorScheme.tertiary
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        ) { content() }
     }
 
     else {
-        Row( verticalAlignment = Alignment.CenterVertically) {
-            ButtonSet(
-                onUpdate = {
-                    val optionsOut = updatedOptions.filter { it.value }.keys
-                    onUpdate(optionsOut)
-                },
-                onSelectAll = {
-                    updatedOptions.forEach { updatedOptions[it.key] = true }
-                },
-                onDeselectAll = {
-                    updatedOptions.forEach { updatedOptions[it.key] = false }
-                }
-            )
-
-            Spacer(modifier = Modifier.height(5.dp))
-
-            LazyColumn {
-                orderedOptions.forEach { key ->
-                    item {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable(onClick = {
-                                    updatedOptions[key] = !(updatedOptions[key]!!)
-                                })
-                                .border(
-                                    width = .5.dp,
-                                    color = Color.Gray
-                                )
-                                .padding(5.dp)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = updatedOptions[key]!!,
-                                    onCheckedChange = {
-                                        updatedOptions[key] = !updatedOptions[key]!!
-                                    }
-                                )
-
-                                val newLinePosPos = key.name.indexOf(" ", 15)
-                                Text(
-//                                text = entry.key.name,
-                                    text = when (newLinePosPos) {
-                                        -1 -> key.name
-                                        else -> key.name.replaceRange(
-                                            newLinePosPos..newLinePosPos,
-                                            "\n"
-                                        )
-                                    }
-                                )
-                            }
-
-                            Text(
-                                text = key.category.replace(" ", "\n"),
-                                textAlign = TextAlign.Right,
-                                color = MaterialTheme.colorScheme.tertiary
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        Row( verticalAlignment = Alignment.CenterVertically) { content() }
     }
 }
 

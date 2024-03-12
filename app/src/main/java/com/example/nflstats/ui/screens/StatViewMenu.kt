@@ -89,6 +89,7 @@ fun StatViewMenu(
             )
 
             Status.LOADING -> LoadingMenu()
+
             else -> FailureMenu()
         }
     }
@@ -141,12 +142,15 @@ private fun PortraitSuccessMenu(
         true -> uiState.currPlayerStats ?: emptyList<Stat>()
     }
     val statsToShow = entity.getStatsToShow()
+
     Scaffold(
-        topBar = @Composable { Header(
-            entity = entity,
-            onAddEntity = onAddEntity,
-            onGetPlayers = onGetPlayers
-        ) }
+        topBar = @Composable {
+            Header(
+                entity = entity,
+                onAddEntity = onAddEntity,
+                onGetPlayers = onGetPlayers
+            )
+        }
     ) {
         LazyColumn(
             modifier = Modifier.padding(it),
@@ -204,7 +208,6 @@ private fun LandscapeSuccessMenu(
 /**
  * Card of a statistic, with name, value, category, and pop-out description
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatCard(stat: Stat) {
     var expanded by remember { mutableStateOf(false) }
